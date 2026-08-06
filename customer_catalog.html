@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#000000">
+<title>Desi Vibes — Where Tradition Meets Trend</title>
+<meta name="description" content="Desi Vibes — Authentic Indian clothing. Where Tradition Meets Trend.">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --black:#0a0a0a;
+  --black2:#111;
+  --gold:#C9973A;
+  --gold-light:#e8b84b;
+  --gold-dim:#8a6520;
+  --gold-bg:rgba(201,151,58,.08);
+  --gold-border:rgba(201,151,58,.25);
+  --magenta:#C2185B;
+  --magenta-light:#e91e8c;
+  --teal:#00897B;
+  --white:#fff;
+  --offwhite:#f5f0e8;
+  --gray:#9a9a9a;
+  --card:#161616;
+  --card2:#1e1e1e;
+  --border:rgba(201,151,58,.18);
+  --radius:3px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--black);font-family:'Inter',sans-serif;color:var(--offwhite);min-height:100vh;overflow-x:hidden}
+
+/* ── ANNOUNCEMENT BAR ── */
+.announce{background:linear-gradient(90deg,var(--black2),#1a1000,var(--black2));color:var(--gold);text-align:center;padding:.5rem 1rem;font-size:.72rem;letter-spacing:.1em;border-bottom:1px solid var(--gold-border)}
+
+/* ── HEADER ── */
+.site-header{background:rgba(10,10,10,.97);border-bottom:1px solid var(--gold-border);position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+.header-inner{max-width:1200px;margin:0 auto;padding:.6rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:.75rem}
+.logo-wrap{display:flex;align-items:center;gap:.7rem;flex:1}
+.logo-img{height:52px;width:52px;object-fit:contain;border-radius:50%;border:1px solid var(--gold-border)}
+.logo-text{display:flex;flex-direction:column;line-height:1}
+.logo-name{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:var(--gold);letter-spacing:.04em}
+.logo-tag{font-size:.58rem;letter-spacing:.14em;color:rgba(201,151,58,.65);text-transform:uppercase;margin-top:.15rem}
+.header-actions{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+.wa-hdr-btn{display:flex;align-items:center;gap:.35rem;background:#25d366;color:#fff;border:none;border-radius:var(--radius);padding:.48rem .85rem;font-size:.78rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap}
+.cart-hdr-btn{display:flex;align-items:center;gap:.35rem;background:var(--gold);color:var(--black);border:none;border-radius:var(--radius);padding:.48rem .85rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;position:relative}
+.cart-badge{background:var(--magenta);color:#fff;border-radius:50%;width:16px;height:16px;font-size:.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;position:absolute;top:-6px;right:-6px}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(180deg,#0a0a0a 0%,#0f0800 50%,#0a0a0a 100%);padding:2rem 1rem 1.5rem;text-align:center;border-bottom:1px solid var(--gold-border);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(201,151,58,.12) 0%,transparent 70%);pointer-events:none}
+.hero-logo{height:130px;width:130px;object-fit:contain;margin:0 auto .75rem;display:block;filter:drop-shadow(0 0 20px rgba(201,151,58,.4))}
+.hero-eyebrow{font-size:.68rem;letter-spacing:.2em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:.5rem}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:1.75rem;font-weight:700;color:var(--gold);line-height:1.2;margin-bottom:.4rem}
+.hero-title em{font-style:italic;color:var(--gold-light)}
+.hero-sub{font-size:.8rem;color:var(--gray);letter-spacing:.06em}
+.hero-divider{display:flex;align-items:center;gap:.6rem;margin:1rem auto;max-width:260px}
+.hero-divider-line{flex:1;height:1px;background:var(--gold-border)}
+.hero-divider-icon{color:var(--gold);font-size:.7rem;opacity:.6}
+
+/* ── FILTER BAR ── */
+.filter-bar{background:rgba(10,10,10,.96);border-bottom:1px solid var(--gold-border);position:sticky;top:65px;z-index:90;backdrop-filter:blur(6px)}
+.filter-inner{padding:.55rem .9rem;display:flex;gap:.4rem;align-items:center;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.filter-inner::-webkit-scrollbar{display:none}
+.search-box{display:flex;align-items:center;background:var(--card2);border:1px solid var(--gold-border);border-radius:var(--radius);padding:.38rem .7rem;gap:.4rem;min-width:130px;flex-shrink:0}
+.search-box input{border:none;outline:none;font-size:.8rem;font-family:'Inter',sans-serif;color:var(--offwhite);background:transparent;width:100px}
+.search-box input::placeholder{color:#555}
+.cat-pill{padding:.3rem .75rem;border-radius:20px;border:1px solid var(--gold-border);background:transparent;color:var(--gray);font-size:.75rem;cursor:pointer;white-space:nowrap;font-family:'Inter',sans-serif;font-weight:500;flex-shrink:0;transition:.15s}
+.cat-pill.active{background:var(--gold);color:var(--black);border-color:var(--gold);font-weight:700}
+.cat-pill:hover:not(.active){border-color:var(--gold);color:var(--gold)}
+.sort-pill{margin-left:auto;flex-shrink:0}
+.sort-pill select{background:var(--card2);border:1px solid var(--gold-border);border-radius:var(--radius);padding:.3rem .55rem;font-size:.75rem;font-family:'Inter',sans-serif;color:var(--offwhite);cursor:pointer;outline:none}
+
+/* ── RESULT BAR ── */
+.result-bar{padding:.45rem .9rem;font-size:.72rem;color:#666;border-bottom:1px solid rgba(255,255,255,.04)}
+.result-bar strong{color:var(--gold)}
+
+/* ── PRODUCT GRID — 2 cols mobile, 3 tablet, 4 desktop ── */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--gold-border)}
+@media(min-width:600px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:960px){.grid{grid-template-columns:repeat(4,1fr)}}
+
+/* ── PRODUCT CARD ── */
+.card{background:var(--card);cursor:pointer;position:relative;display:flex;flex-direction:column}
+.card-img{aspect-ratio:3/4;overflow:hidden;background:var(--card2);position:relative;flex-shrink:0}
+.card-img img{width:100%;height:100%;object-fit:cover;transition:.4s;display:block}
+.card:active .card-img img{transform:scale(1.03)}
+.card-img-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2.5rem;background:linear-gradient(135deg,#1a1000,#0a1a1a)}
+
+/* OOS */
+.oos-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55)}
+.oos-badge{position:absolute;top:8px;right:8px;background:var(--magenta);color:#fff;font-size:.62rem;font-weight:700;padding:.2rem .6rem;letter-spacing:.06em;text-transform:uppercase;border-radius:2px}
+
+/* ADD TO CART — always visible on mobile, hover on desktop */
+.add-cart-btn{position:absolute;bottom:0;left:0;right:0;background:rgba(201,151,58,.92);color:var(--black);border:none;padding:.55rem;font-size:.75rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:.05em;text-transform:uppercase}
+@media(min-width:960px){
+  .add-cart-btn{transform:translateY(100%);transition:.2s;background:rgba(201,151,58,.95)}
+  .card:hover .add-cart-btn{transform:translateY(0)}
+}
+
+/* CARD BODY */
+.card-body{padding:.6rem .7rem .75rem;flex:1;display:flex;flex-direction:column;gap:.15rem}
+.card-price{font-size:.95rem;font-weight:700;color:var(--gold)}
+.card-name{font-size:.8rem;color:var(--offwhite);line-height:1.3;font-weight:500}
+.card-num{font-size:.68rem;color:#555}
+.oos-lbl{font-size:.7rem;color:var(--magenta);font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-top:.1rem}
+
+/* ── CART DRAWER ── */
+.cart-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200}
+.cart-backdrop.open{display:block}
+.cart-drawer{position:fixed;top:0;right:0;bottom:0;width:min(92vw,380px);background:var(--black2);z-index:201;transform:translateX(100%);transition:.3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;border-left:1px solid var(--gold-border)}
+.cart-drawer.open{transform:translateX(0)}
+.cart-head{padding:1rem 1.1rem;border-bottom:1px solid var(--gold-border);display:flex;align-items:center;justify-content:space-between;background:var(--black)}
+.cart-head h2{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;color:var(--gold)}
+.cart-close{background:none;border:1px solid var(--gold-border);color:var(--gold);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1rem;line-height:1;display:flex;align-items:center;justify-content:center}
+.cart-items{flex:1;overflow-y:auto;padding:.85rem 1.1rem;-webkit-overflow-scrolling:touch}
+.cart-item{display:flex;gap:.75rem;padding:.75rem 0;border-bottom:1px solid rgba(201,151,58,.1)}
+.cart-item-img{width:55px;height:70px;object-fit:cover;border-radius:2px;background:var(--card2);flex-shrink:0;border:1px solid var(--gold-border)}
+.cart-item-img-ph{width:55px;height:70px;background:#1a1000;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;border-radius:2px;border:1px solid var(--gold-border)}
+.cart-item-info{flex:1;min-width:0}
+.cart-item-name{font-size:.82rem;font-weight:600;color:var(--offwhite);line-height:1.3;margin-bottom:.15rem}
+.cart-item-meta{font-size:.7rem;color:#666;margin-bottom:.2rem}
+.cart-item-price{font-size:.88rem;font-weight:700;color:var(--gold)}
+.cart-remove{background:none;border:none;color:#444;cursor:pointer;font-size:.95rem;flex-shrink:0;align-self:flex-start;padding:.1rem;line-height:1}
+.cart-remove:hover{color:var(--magenta)}
+.cart-empty{text-align:center;padding:3rem 1rem;color:#555}
+.cart-empty-icon{font-size:2.5rem;display:block;margin-bottom:.75rem;opacity:.5}
+.cart-footer{padding:1rem 1.1rem;border-top:1px solid var(--gold-border);background:var(--black)}
+.cart-total{display:flex;justify-content:space-between;font-size:.9rem;font-weight:700;margin-bottom:.75rem;color:var(--offwhite)}
+.cart-total span:last-child{color:var(--gold)}
+.cart-note label{font-size:.68rem;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:.28rem}
+.cart-note textarea{width:100%;background:var(--card2);border:1px solid var(--gold-border);border-radius:var(--radius);padding:.5rem .7rem;font-size:.8rem;font-family:'Inter',sans-serif;resize:none;outline:none;margin-bottom:.75rem;color:var(--offwhite)}
+.cart-note textarea:focus{border-color:var(--gold)}
+.wa-checkout-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:.5rem;background:#25d366;color:#fff;border:none;border-radius:var(--radius);padding:.82rem;font-size:.9rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:.02em}
+.wa-checkout-btn:hover{background:#1da851}
+.cart-item-count{font-size:.7rem;color:#555;text-align:center;margin-bottom:.5rem}
+
+/* ── PRODUCT MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;align-items:flex-end;justify-content:center}
+@media(min-width:640px){.modal-bg{align-items:center}}
+.modal-bg.open{display:flex}
+.modal{background:var(--black2);width:100%;max-width:600px;max-height:92vh;overflow-y:auto;border-radius:12px 12px 0 0;border:1px solid var(--gold-border);display:flex;flex-direction:column;-webkit-overflow-scrolling:touch}
+@media(min-width:640px){.modal{border-radius:6px;flex-direction:row;max-height:84vh;overflow:hidden}}
+.modal-img-col{flex:1;background:var(--card);min-height:260px;position:relative;overflow:hidden;flex-shrink:0}
+@media(min-width:640px){.modal-img-col{min-height:auto}}
+.modal-img-col img{width:100%;height:100%;object-fit:cover;display:block}
+.modal-img-ph{width:100%;height:260px;display:flex;align-items:center;justify-content:center;font-size:5rem;background:linear-gradient(135deg,#1a1000,#0a1a1a)}
+@media(min-width:640px){.modal-img-ph{height:100%}}
+.modal-oos-banner{position:absolute;bottom:0;left:0;right:0;background:rgba(194,24,91,.9);color:#fff;text-align:center;padding:.4rem;font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.modal-info{flex:1;padding:1.25rem;display:flex;flex-direction:column;gap:.6rem;overflow-y:auto}
+.modal-close{align-self:flex-end;background:none;border:1px solid var(--gold-border);color:var(--gold);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-bottom:.25rem}
+.modal-cat{display:inline-block;background:rgba(0,137,123,.15);color:var(--teal);font-size:.68rem;font-weight:700;padding:.18rem .6rem;border-radius:10px;letter-spacing:.05em;text-transform:uppercase;border:1px solid rgba(0,137,123,.3)}
+.modal-num{font-size:.7rem;color:#555;letter-spacing:.06em;text-transform:uppercase}
+.modal-name{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:var(--gold);line-height:1.25}
+.modal-price{font-size:1.45rem;font-weight:700;color:var(--gold-light)}
+.modal-divider{height:1px;background:var(--gold-border)}
+.modal-desc{font-size:.82rem;color:#888;line-height:1.75}
+.modal-add-btn{background:var(--gold);color:var(--black);border:none;border-radius:var(--radius);padding:.8rem;font-size:.85rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;text-transform:uppercase;letter-spacing:.06em;margin-top:auto}
+.modal-add-btn:hover{background:var(--gold-light)}
+.modal-add-btn.oos{background:#2a2a2a;color:#555;cursor:not-allowed}
+.modal-wa-btn{display:flex;align-items:center;justify-content:center;gap:.45rem;background:transparent;color:#25d366;border:1px solid #25d366;border-radius:var(--radius);padding:.65rem;font-size:.8rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-top:.4rem}
+.modal-wa-btn:hover{background:#25d366;color:#fff}
+
+/* ── FOOTER ── */
+.site-footer{background:var(--black);border-top:1px solid var(--gold-border);padding:2rem 1rem;text-align:center;margin-top:1px}
+.footer-logo-img{height:70px;width:70px;object-fit:contain;margin:0 auto .6rem;display:block;opacity:.9}
+.footer-name{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;color:var(--gold);margin-bottom:.2rem}
+.footer-tag{font-size:.65rem;letter-spacing:.14em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:.85rem}
+.footer-divider{width:36px;height:1px;background:var(--gold-border);margin:.7rem auto}
+.footer-info{font-size:.75rem;color:#444}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:1.25rem;left:50%;transform:translateX(-50%) translateY(50px);background:var(--gold);color:var(--black);padding:.55rem 1.1rem;border-radius:20px;font-size:.8rem;font-weight:700;z-index:400;transition:.25s;opacity:0;white-space:nowrap;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* ── MOBILE CART FLOAT BUTTON (when cart > 0) ── */
+.cart-float{display:none;position:fixed;bottom:1.25rem;right:1rem;background:var(--gold);color:var(--black);border:none;border-radius:24px;padding:.6rem 1.1rem;font-size:.82rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;z-index:150;align-items:center;gap:.4rem;box-shadow:0 4px 20px rgba(201,151,58,.4)}
+.cart-float.visible{display:flex}
+@media(min-width:960px){.cart-float{display:none!important}}
+
+@media(max-width:380px){
+  .logo-name{font-size:1.25rem}
+  .hero-title{font-size:1.45rem}
+  .hero-logo{height:100px;width:100px}
+}
+</style>
+</head>
+<body>
+
+<script>
+const YOUR_WHATSAPP = '14042639295';
+const LOGO_URL = 'Desi_Vibe_Logo.png';
+const SHEET_CSV_URL = '';
+</script>
+
+<!-- ANNOUNCE -->
+<div class="announce">✦ Authentic Indian Fashion · New Arrivals Weekly · WhatsApp to Order ✦</div>
+
+<!-- HEADER -->
+<div class="site-header">
+  <div class="header-inner">
+    <div class="logo-wrap">
+      <img class="logo-img" src="Desi_Vibe_Logo.png" alt="Desi Vibes Logo" onerror="this.style.display='none'">
+      <div class="logo-text">
+        <span class="logo-name">Desi Vibes</span>
+        <span class="logo-tag">Where Tradition Meets Trend</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="wa-hdr-btn" onclick="openStoreWA()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Chat
+      </button>
+      <button class="cart-hdr-btn" onclick="openCart()">
+        🛍 Cart
+        <span class="cart-badge" id="cart-count" style="display:none">0</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <img class="hero-logo" src="Desi_Vibe_Logo.png" alt="Desi Vibes" onerror="this.style.display='none'">
+  <div class="hero-eyebrow">✦ New Collection ✦</div>
+  <div class="hero-title">Authentic Indian Fashion<br><em>Handpicked for You</em></div>
+  <div class="hero-divider"><div class="hero-divider-line"></div><div class="hero-divider-icon">✦</div><div class="hero-divider-line"></div></div>
+  <div class="hero-sub">Sarees · Salwar Suits · Lehenghas · Kurtis & More</div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <div class="filter-inner">
+    <div class="search-box">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="search" placeholder="Search..." oninput="renderGrid()">
+    </div>
+    <button class="cat-pill active" data-cat="" onclick="filterCat(this)">All</button>
+    <button class="cat-pill" data-cat="Saree" onclick="filterCat(this)">Sarees</button>
+    <button class="cat-pill" data-cat="Salwar Suit" onclick="filterCat(this)">Salwar</button>
+    <button class="cat-pill" data-cat="Lehenga" onclick="filterCat(this)">Lehenga</button>
+    <button class="cat-pill" data-cat="Kurti" onclick="filterCat(this)">Kurti</button>
+    <button class="cat-pill" data-cat="Other" onclick="filterCat(this)">Other</button>
+    <div class="sort-pill">
+      <select id="sort-select" onchange="renderGrid()">
+        <option value="newest">Newest</option>
+        <option value="price-low">Price ↑</option>
+        <option value="price-high">Price ↓</option>
+        <option value="available">Available First</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div class="result-bar" id="result-bar">Loading...</div>
+<div class="grid" id="grid"></div>
+
+<!-- FOOTER -->
+<div class="site-footer">
+  <img class="footer-logo-img" src="Desi_Vibe_Logo.png" alt="Desi Vibes" onerror="this.style.display='none'">
+  <div class="footer-name">Desi Vibes</div>
+  <div class="footer-tag">Where Tradition Meets Trend</div>
+  <div class="footer-divider"></div>
+  <div class="footer-info">Browse · Add to cart · Order via WhatsApp 🛍️</div>
+</div>
+
+<!-- MOBILE CART FLOAT -->
+<button class="cart-float" id="cart-float" onclick="openCart()">
+  🛍 View Cart (<span id="cart-float-count">0</span>)
+</button>
+
+<!-- CART DRAWER -->
+<div class="cart-backdrop" id="cart-backdrop" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cart-drawer">
+  <div class="cart-head">
+    <h2>Your Cart</h2>
+    <button class="cart-close" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items"></div>
+  <div class="cart-footer" id="cart-footer" style="display:none">
+    <div class="cart-total"><span>Total</span><span id="cart-total-val">$0.00</span></div>
+    <div class="cart-note">
+      <label>Your message (optional)</label>
+      <textarea id="cart-note" rows="2" placeholder="e.g. Please confirm availability..."></textarea>
+    </div>
+    <div class="cart-item-count" id="cart-item-count"></div>
+    <button class="wa-checkout-btn" onclick="sendCartWA()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Send Order via WhatsApp
+    </button>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-bg" id="modal" onclick="closeModal(event)">
+  <div class="modal" id="modal-box">
+    <div class="modal-img-col" id="m-img-col"></div>
+    <div class="modal-info">
+      <button class="modal-close" onclick="closeModalBtn()">✕</button>
+      <div class="modal-cat" id="m-cat"></div>
+      <div class="modal-num" id="m-num"></div>
+      <div class="modal-name" id="m-name"></div>
+      <div class="modal-price" id="m-price"></div>
+      <div class="modal-divider"></div>
+      <div class="modal-desc" id="m-desc"></div>
+      <button class="modal-add-btn" id="m-add-btn" onclick="addFromModal()">Add to Cart</button>
+      <button class="modal-wa-btn" onclick="quickWA()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Ask About This Item
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let allProducts=[], cart=[], activeCategory='', currentItem=null;
+
+function loadData(){
+  const local=JSON.parse(localStorage.getItem('clothing_products')||'[]');
+  if(local.length){ allProducts=local; renderGrid(); }
+  if(SHEET_CSV_URL) loadSheet();
+  setInterval(()=>{ if(SHEET_CSV_URL) loadSheet(); else{ allProducts=JSON.parse(localStorage.getItem('clothing_products')||'[]'); renderGrid(); }},60000);
+}
+
+function loadSheet(){
+  fetch(SHEET_CSV_URL+'&t='+Date.now()).then(r=>r.text()).then(csv=>{
+    const rows=csv.trim().split('\n').slice(1), loaded=[];
+    rows.forEach(row=>{
+      const c=row.split(',').map(x=>x.replace(/^"|"$/g,'').trim()); if(!c[0]) return;
+      loaded.push({id:c[0],name:c[1],cat:c[2]||'Other',retail:parseFloat(c[4])||0,img:c[5]||'',qty:parseInt(c[6])||1,status:c[7]||'Active',notes:c[8]||''});
+    });
+    if(loaded.length){ allProducts=loaded; renderGrid(); }
+  }).catch(()=>{});
+}
+
+function renderGrid(){
+  const search=(document.getElementById('search').value||'').toLowerCase();
+  const sort=document.getElementById('sort-select').value;
+  let list=[...allProducts].filter(p=>{
+    if(search&&!p.name.toLowerCase().includes(search)&&!p.id.toLowerCase().includes(search)) return false;
+    if(activeCategory&&p.cat!==activeCategory) return false;
+    return true;
+  });
+  if(sort==='price-low') list.sort((a,b)=>a.retail-b.retail);
+  else if(sort==='price-high') list.sort((a,b)=>b.retail-a.retail);
+  else if(sort==='available') list.sort((a,b)=>(a.status==='Active'?0:1)-(b.status==='Active'?0:1));
+  const avail=list.filter(p=>p.status==='Active').length;
+  document.getElementById('result-bar').innerHTML=`<strong>${list.length}</strong> pieces · <strong>${avail}</strong> available`;
+  const grid=document.getElementById('grid');
+  if(!list.length){ grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:5rem;color:#555">No items found</div>`; return; }
+  const oos=p=>p.status!=='Active';
+  grid.innerHTML=list.map(p=>`
+    <div class="card" onclick="openModal('${p.id}')">
+      <div class="card-img">
+        ${p.img?`<img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=card-img-ph>👗</div>'">`:`<div class="card-img-ph">👗</div>`}
+        ${oos(p)?`<div class="oos-overlay"></div><div class="oos-badge">Out of Stock</div>`:`<button class="add-cart-btn" onclick="event.stopPropagation();addToCart('${p.id}')">+ Add to Cart</button>`}
+      </div>
+      <div class="card-body">
+        <div class="card-price">$${p.retail.toFixed(2)}</div>
+        <div class="card-name">${p.name}</div>
+        <div class="card-num">Item # ${p.id}</div>
+        ${oos(p)?`<div class="oos-lbl">Out of Stock</div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function filterCat(btn){
+  document.querySelectorAll('.cat-pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); activeCategory=btn.dataset.cat; renderGrid();
+}
+
+function openModal(id){
+  const p=allProducts.find(x=>x.id===id); if(!p) return;
+  currentItem=p; const oos=p.status!=='Active';
+  document.getElementById('m-cat').textContent=p.cat;
+  document.getElementById('m-num').textContent='Item # '+p.id;
+  document.getElementById('m-name').textContent=p.name;
+  document.getElementById('m-price').textContent='$'+p.retail.toFixed(2);
+  document.getElementById('m-desc').textContent=p.notes||'Authentic Indian clothing, handpicked with care. Contact us on WhatsApp for sizing and availability.';
+  const col=document.getElementById('m-img-col');
+  col.innerHTML=(p.img?`<img src="${p.img}" alt="${p.name}" onerror="this.outerHTML='<div class=modal-img-ph>👗</div>'">`:`<div class="modal-img-ph">👗</div>`)+(oos?`<div class="modal-oos-banner">Out of Stock</div>`:'');
+  const btn=document.getElementById('m-add-btn');
+  btn.textContent=oos?'Out of Stock':'Add to Cart';
+  btn.className='modal-add-btn'+(oos?' oos':'');
+  document.getElementById('modal').classList.add('open'); document.body.style.overflow='hidden';
+}
+function closeModal(e){ if(e&&e.target!==document.getElementById('modal')) return; closeModalBtn(); }
+function closeModalBtn(){ document.getElementById('modal').classList.remove('open'); document.body.style.overflow=''; currentItem=null; }
+function addFromModal(){ if(!currentItem||currentItem.status!=='Active') return; addToCart(currentItem.id); closeModalBtn(); }
+function quickWA(){
+  if(!currentItem) return;
+  const p=currentItem;
+  const msg=`Hi Desi Vibes! 👗\n\nI'm interested in:\n*${p.name}*\nItem # ${p.id}  ·  $${p.retail.toFixed(2)}\n\nIs this available? 🙏`;
+  window.open(`https://wa.me/${YOUR_WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
+function addToCart(id){
+  const p=allProducts.find(x=>x.id===id);
+  if(!p||p.status!=='Active'){showToast('Item not available');return;}
+  if(cart.find(x=>x.id===id)){showToast('Already in your cart');return;}
+  cart.push(p); updateCartUI(); showToast('Added to cart ✓'); openCart();
+}
+function removeFromCart(id){ cart=cart.filter(x=>x.id!==id); updateCartUI(); }
+
+function updateCartUI(){
+  const cnt=document.getElementById('cart-count');
+  const floatBtn=document.getElementById('cart-float');
+  const floatCnt=document.getElementById('cart-float-count');
+  if(cart.length){
+    cnt.textContent=cart.length; cnt.style.display='flex';
+    floatBtn.classList.add('visible'); floatCnt.textContent=cart.length;
+  } else {
+    cnt.style.display='none'; floatBtn.classList.remove('visible');
+  }
+  const items=document.getElementById('cart-items'), footer=document.getElementById('cart-footer');
+  if(!cart.length){
+    items.innerHTML=`<div class="cart-empty"><span class="cart-empty-icon">🛍️</span>Your cart is empty.<br><br>Browse items and tap<br><strong style="color:var(--gold)">Add to Cart</strong></div>`;
+    footer.style.display='none'; return;
+  }
+  footer.style.display='block';
+  items.innerHTML=cart.map(p=>`
+    <div class="cart-item">
+      ${p.img?`<img class="cart-item-img" src="${p.img}" alt="${p.name}" onerror="this.outerHTML='<div class=cart-item-img-ph>👗</div>'">`:`<div class="cart-item-img-ph">👗</div>`}
+      <div class="cart-item-info">
+        <div class="cart-item-name">${p.name}</div>
+        <div class="cart-item-meta">Item # ${p.id} · ${p.cat}</div>
+        <div class="cart-item-price">$${p.retail.toFixed(2)}</div>
+      </div>
+      <button class="cart-remove" onclick="removeFromCart('${p.id}')">✕</button>
+    </div>`).join('');
+  const total=cart.reduce((a,p)=>a+p.retail,0);
+  document.getElementById('cart-total-val').textContent='$'+total.toFixed(2);
+  document.getElementById('cart-item-count').textContent=cart.length+' item'+(cart.length!==1?'s':'')+' selected';
+}
+
+function openCart(){ document.getElementById('cart-drawer').classList.add('open'); document.getElementById('cart-backdrop').classList.add('open'); document.body.style.overflow='hidden'; }
+function closeCart(){ document.getElementById('cart-drawer').classList.remove('open'); document.getElementById('cart-backdrop').classList.remove('open'); document.body.style.overflow=''; }
+
+function sendCartWA(){
+  if(!cart.length) return;
+  const note=document.getElementById('cart-note').value.trim();
+  const total=cart.reduce((a,p)=>a+p.retail,0);
+  let msg=`🛍️ *Order Request — Desi Vibes*\n_Where Tradition Meets Trend_\n\n`;
+  cart.forEach((p,i)=>{ msg+=`${i+1}. *${p.name}*\n   Item # ${p.id}  ·  $${p.retail.toFixed(2)}\n`; });
+  msg+=`\n💰 *Total: $${total.toFixed(2)}*`;
+  if(note) msg+=`\n\n💬 *Note:* ${note}`;
+  msg+=`\n\nPlease confirm availability. Thank you! 🙏`;
+  window.open(`https://wa.me/${YOUR_WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank');
+}
+function openStoreWA(){ window.open(`https://wa.me/${YOUR_WHATSAPP}?text=${encodeURIComponent('Hi Desi Vibes! 👗 I would like to browse your collection.')}`, '_blank'); }
+
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
+
+// Close modal on swipe down on mobile
+let touchStartY=0;
+document.getElementById('modal-box').addEventListener('touchstart',e=>{touchStartY=e.touches[0].clientY;},{passive:true});
+document.getElementById('modal-box').addEventListener('touchmove',e=>{
+  if(e.touches[0].clientY-touchStartY>80) closeModalBtn();
+},{passive:true});
+
+loadData();
+</script>
+</body>
+</html>
