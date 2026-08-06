@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Desi Vibes — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --black:#0a0a0a;--black2:#111;--black3:#161616;
+  --gold:#C9973A;--gold-light:#e8b84b;--gold-dim:#8a6520;
+  --gold-bg:rgba(201,151,58,.08);--gold-border:rgba(201,151,58,.22);
+  --magenta:#C2185B;--teal:#00897B;
+  --green:#2e7d32;--green-light:rgba(46,125,50,.12);
+  --blue:#1565c0;--blue-light:rgba(21,101,192,.12);
+  --saffron:#E8650A;--saffron-light:rgba(232,101,10,.12);
+  --offwhite:#f0ebe0;--gray:#777;--muted:#555;
+  --card:#161616;--card2:#1e1e1e;
+  --border:rgba(201,151,58,.2);--radius:5px;
+}
+body{background:var(--black);font-family:'Inter',sans-serif;color:var(--offwhite);min-height:100vh}
+
+/* LOGIN */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:radial-gradient(ellipse at center,#1a1000 0%,#000 70%)}
+.login-box{background:var(--card);border:1px solid var(--gold-border);border-radius:12px;padding:2.25rem 1.75rem;width:min(92vw,340px);text-align:center}
+.login-logo{height:90px;width:90px;object-fit:contain;margin:0 auto .75rem;display:block;filter:drop-shadow(0 0 16px rgba(201,151,58,.4))}
+.login-brand{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;color:var(--gold);margin-bottom:.1rem}
+.login-tag{font-size:.62rem;letter-spacing:.14em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:1.5rem;display:block}
+.login-box input{width:100%;padding:.72rem 1rem;background:var(--card2);border:1.5px solid var(--border);border-radius:var(--radius);font-size:.92rem;outline:none;font-family:'Inter',sans-serif;color:var(--offwhite);margin-bottom:.85rem}
+.login-box input:focus{border-color:var(--gold)}
+.login-box input::placeholder{color:#444}
+.login-box button{width:100%;padding:.78rem;background:var(--gold);color:var(--black);border:none;border-radius:var(--radius);font-size:.92rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:.03em}
+.login-box button:hover{background:var(--gold-light)}
+.login-err{color:var(--magenta);font-size:.78rem;margin-top:.4rem;display:none}
+
+/* APP */
+#app{display:none}
+header{background:var(--black2);border-bottom:1px solid var(--gold-border);padding:.7rem 1rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.hdr-brand{display:flex;align-items:center;gap:.55rem}
+.hdr-logo{height:34px;width:34px;object-fit:contain;border-radius:50%;border:1px solid var(--gold-border)}
+.hdr-name{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:700;color:var(--gold)}
+.hdr-sub{font-size:.6rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.logout-btn{background:transparent;border:1px solid var(--gold-border);color:var(--gold);padding:.38rem .8rem;border-radius:var(--radius);cursor:pointer;font-size:.75rem;font-family:'Inter',sans-serif}
+.logout-btn:hover{background:var(--gold-bg)}
+
+/* TABS — scrollable on mobile */
+.tabs{display:flex;background:var(--black2);border-bottom:1px solid var(--gold-border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:.75rem .95rem;cursor:pointer;font-size:.8rem;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;font-family:'Inter',sans-serif;flex-shrink:0}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:600}
+
+/* CONTENT */
+.content{padding:1rem;max-width:1100px;margin:0 auto}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:1rem}
+@media(min-width:600px){.stats{grid-template-columns:repeat(6,1fr)}}
+.stat{background:var(--card);border-radius:var(--radius);padding:.85rem .75rem;border:1px solid var(--border);text-align:center}
+.stat-val{font-size:1.35rem;font-weight:700;color:var(--gold);line-height:1}
+.stat-lbl{font-size:.62rem;color:var(--muted);margin-top:.28rem;text-transform:uppercase;letter-spacing:.05em}
+
+/* SECTION */
+.section{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:1rem;overflow:hidden}
+.sec-head{padding:.75rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:rgba(201,151,58,.04)}
+.sec-head h2{font-size:.82rem;font-weight:600;color:var(--gold)}
+.sec-body{padding:1rem}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+@media(min-width:600px){.form-grid{grid-template-columns:repeat(3,1fr)}}
+.fg{display:flex;flex-direction:column;gap:.28rem}
+.fg label{font-size:.65rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.fg input,.fg select,.fg textarea{padding:.55rem .8rem;background:var(--card2);border:1.5px solid var(--border);border-radius:var(--radius);font-size:.85rem;outline:none;font-family:'Inter',sans-serif;color:var(--offwhite);transition:.15s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--gold)}
+.fg select option{background:var(--card2)}
+.fg textarea{resize:vertical;min-height:65px}
+
+/* IMAGE UPLOAD */
+.img-zone{border:2px dashed var(--gold-border);border-radius:var(--radius);padding:1rem;text-align:center;cursor:pointer;background:var(--gold-bg);position:relative;transition:.2s}
+.img-zone:hover{border-color:var(--gold)}
+.img-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.img-zone-icon{font-size:1.5rem;display:block;margin-bottom:.22rem}
+.img-zone-txt{font-size:.78rem;color:var(--gold);font-weight:600}
+.img-zone-sub{font-size:.67rem;color:var(--muted);margin-top:.12rem}
+.img-preview{max-width:100px;max-height:125px;object-fit:cover;border-radius:4px;border:1px solid var(--gold-border);display:none}
+.img-remove{position:absolute;top:-7px;right:-7px;background:var(--magenta);color:#fff;border:none;border-radius:50%;width:19px;height:19px;font-size:.65rem;cursor:pointer;display:none;line-height:19px}
+
+/* MARGIN CALC */
+.calc-box{background:var(--green-light);border:1px solid rgba(46,125,50,.25);border-radius:var(--radius);padding:.9rem;margin-top:.85rem}
+.calc-row{display:flex;justify-content:space-between;padding:.25rem 0;border-bottom:1px solid rgba(46,125,50,.2);font-size:.8rem}
+.calc-row:last-child{border:none;padding-top:.5rem;font-size:.88rem;font-weight:700}
+.calc-label{color:var(--muted)}
+.calc-val{font-weight:600;color:#4caf50}
+.calc-big{font-size:.95rem;color:#4caf50;font-weight:700}
+.margin-bar{height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:.45rem}
+.margin-fill{height:100%;background:linear-gradient(90deg,#e53935,#fb8c00,#43a047);transition:.4s}
+.margin-verdict{font-size:.67rem;color:#66bb6a;text-align:right;margin-top:.3rem}
+
+/* BUTTONS */
+.btn{padding:.52rem 1rem;border-radius:var(--radius);font-size:.8rem;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:.15s}
+.btn-gold{background:var(--gold);color:var(--black)}
+.btn-gold:hover{background:var(--gold-light)}
+.btn-outline{background:transparent;color:var(--gold);border:1px solid var(--gold-border)}
+.btn-outline:hover{background:var(--gold-bg)}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{background:#1b5e20}
+.btn-saffron{background:var(--saffron);color:#fff}
+.btn-row{display:flex;gap:.5rem;margin-top:.85rem;flex-wrap:wrap}
+
+/* SEARCH */
+.search-row{display:flex;gap:.55rem;margin-bottom:.85rem;flex-wrap:wrap}
+.search-row input,.search-row select{padding:.45rem .75rem;background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);font-size:.8rem;outline:none;font-family:'Inter',sans-serif;color:var(--offwhite)}
+.search-row input{flex:1;min-width:130px}
+.search-row input:focus,.search-row select:focus{border-color:var(--gold)}
+.search-row select option{background:var(--card2)}
+
+/* TABLE — horizontal scroll on mobile */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:.78rem;min-width:600px}
+th{background:rgba(201,151,58,.06);color:var(--gold-dim);font-weight:600;padding:.55rem .8rem;text-align:left;white-space:nowrap;font-size:.67rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)}
+td{padding:.58rem .8rem;border-bottom:1px solid rgba(255,255,255,.04);color:var(--offwhite);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(201,151,58,.03)}
+.img-thumb{width:38px;height:48px;object-fit:cover;border-radius:3px;border:1px solid var(--border)}
+.img-ph{width:38px;height:48px;background:#1a1000;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:.9rem}
+.badge{display:inline-block;padding:2px 7px;border-radius:8px;font-size:.65rem;font-weight:700;letter-spacing:.03em}
+.badge-active{background:rgba(46,125,50,.15);color:#66bb6a;border:1px solid rgba(46,125,50,.2)}
+.badge-sold{background:var(--saffron-light);color:var(--saffron);border:1px solid rgba(232,101,10,.2)}
+.act-btn{padding:.22rem .55rem;border-radius:3px;font-size:.68rem;cursor:pointer;border:none;font-weight:600;margin-right:3px;font-family:'Inter',sans-serif}
+.act-sell{background:var(--saffron-light);color:var(--saffron)}
+.act-relist{background:var(--green-light);color:#66bb6a}
+.act-del{background:rgba(194,24,91,.1);color:var(--magenta)}
+
+/* SHEET CONFIG */
+.sheet-config{background:rgba(201,151,58,.06);border:1px solid var(--gold-border);border-radius:var(--radius);padding:.8rem 1rem;margin-bottom:1rem;display:flex;align-items:center;gap:.65rem;flex-wrap:wrap}
+.sheet-config input{flex:1;min-width:180px;padding:.45rem .75rem;background:var(--card2);border:1.5px solid var(--gold-border);border-radius:var(--radius);font-size:.78rem;outline:none;font-family:'Inter',sans-serif;color:var(--offwhite)}
+.sheet-lbl{font-size:.75rem;color:var(--gold-dim);white-space:nowrap;font-weight:600}
+
+/* WA */
+.wa-preview{background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.2);border-radius:var(--radius);padding:.85rem;margin-top:.85rem;font-size:.78rem;color:#66bb6a}
+
+.pane{display:none}
+.pane.active{display:block}
+
+@media(max-width:480px){
+  .content{padding:.75rem}
+  .form-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <img class="login-logo" src="Desi_Vibe_Logo.png" alt="Desi Vibes" onerror="this.style.display='none'">
+    <div class="login-brand">Desi Vibes</div>
+    <span class="login-tag">Admin Portal</span>
+    <input type="password" id="pwd-input" placeholder="Enter admin password">
+    <button onclick="doLogin()">Sign In</button>
+    <div class="login-err" id="login-err">Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header>
+    <div class="hdr-brand">
+      <img class="hdr-logo" src="Desi_Vibe_Logo.png" alt="DV" onerror="this.style.display='none'">
+      <div>
+        <div class="hdr-name">Desi Vibes</div>
+        <div class="hdr-sub">Admin · Tupi Desai</div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+  </header>
+
+  <div style="padding:.75rem 1rem 0;max-width:1100px;margin:0 auto">
+    <div class="sheet-config">
+      <span class="sheet-lbl">📊 Google Sheet CSV:</span>
+      <input type="text" id="sheet-url" placeholder="Paste published CSV URL...">
+      <button class="btn btn-gold" onclick="loadFromSheet()">Sync</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('dashboard',this)">📊 Dashboard</div>
+    <div class="tab" onclick="switchTab('add',this)">➕ Add Item</div>
+    <div class="tab" onclick="switchTab('inventory',this)">📦 Inventory</div>
+    <div class="tab" onclick="switchTab('sales',this)">💰 Sales</div>
+    <div class="tab" onclick="switchTab('share',this)">📲 Share</div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div id="pane-dashboard" class="pane active">
+      <div class="stats">
+        <div class="stat"><div class="stat-val" id="s-total">0</div><div class="stat-lbl">Total</div></div>
+        <div class="stat"><div class="stat-val" id="s-active">0</div><div class="stat-lbl">Active</div></div>
+        <div class="stat"><div class="stat-val" id="s-sold" style="color:var(--saffron)">0</div><div class="stat-lbl">Sold Out</div></div>
+        <div class="stat"><div class="stat-val" id="s-invest" style="font-size:1.05rem">$0</div><div class="stat-lbl">Cost</div></div>
+        <div class="stat"><div class="stat-val" id="s-retail" style="font-size:1.05rem;color:#64b5f6">$0</div><div class="stat-lbl">Retail</div></div>
+        <div class="stat"><div class="stat-val" id="s-profit" style="font-size:1.05rem;color:#66bb6a">$0</div><div class="stat-lbl">Profit</div></div>
+      </div>
+      <div class="section">
+        <div class="sec-head"><h2>Recent Items</h2></div>
+        <div class="sec-body"><div id="recent-list" style="color:var(--muted);text-align:center;padding:2rem;font-size:.82rem">No products yet.</div></div>
+      </div>
+    </div>
+
+    <!-- ADD ITEM -->
+    <div id="pane-add" class="pane">
+      <div class="section">
+        <div class="sec-head"><h2>➕ Add New Item</h2></div>
+        <div class="sec-body">
+          <div class="form-grid">
+            <div class="fg"><label>Item Number *</label><input type="text" id="f-id" placeholder="e.g. 12345"></div>
+            <div class="fg"><label>Item Name *</label><input type="text" id="f-name" placeholder="e.g. Red Banarasi Saree"></div>
+            <div class="fg"><label>Category</label>
+              <select id="f-cat">
+                <option>Saree</option><option>Salwar Suit</option><option>Lehenga</option>
+                <option>Kurti</option><option>Dupatta</option><option>Dress Material</option>
+                <option>Indo-Western</option><option>Other</option>
+              </select>
+            </div>
+            <div class="fg"><label>Your Cost ($) *</label><input type="number" id="f-cost" placeholder="0.00" step="0.01" oninput="calcMargin()"></div>
+            <div class="fg"><label>Retail Price ($) *</label><input type="number" id="f-retail" placeholder="0.00" step="0.01" oninput="calcMargin()"></div>
+            <div class="fg"><label>Qty</label><input type="number" id="f-qty" value="1" min="1"></div>
+            <div class="fg" style="grid-column:1/-1">
+              <label>Product Photo</label>
+              <div class="img-zone">
+                <input type="file" id="f-img-file" accept="image/*" onchange="handleImgUpload(event)">
+                <span class="img-zone-icon">📷</span>
+                <div class="img-zone-txt">Tap to upload photo</div>
+                <div class="img-zone-sub">JPG · PNG · WEBP · Max 5MB · Phone camera or gallery</div>
+              </div>
+              <div id="preview-wrap" style="display:none;margin-top:.6rem">
+                <div style="position:relative;display:inline-block">
+                  <img id="img-preview" class="img-preview" src="" alt="Preview" style="display:block">
+                  <button class="img-remove" id="img-remove-btn" onclick="removeImg()" style="display:block">✕</button>
+                </div>
+              </div>
+              <div style="font-size:.68rem;color:var(--muted);margin-top:.4rem">— or paste GitHub image URL:</div>
+              <input type="text" id="f-img-url" placeholder="https://MTGStore.github.io/clothing-catalog/images/12345.jpg" style="margin-top:.28rem" oninput="handleUrlInput()">
+            </div>
+            <div class="fg" style="grid-column:1/-1">
+              <label>Description (shown to customers)</label>
+              <textarea id="f-notes" placeholder="e.g. Pure silk, hand embroidered, free size fits S-XL. Color: Deep Red."></textarea>
+            </div>
+          </div>
+
+          <div class="calc-box">
+            <div style="font-size:.67rem;font-weight:700;color:#66bb6a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem">💹 Margin Calculator</div>
+            <div class="calc-row"><span class="calc-label">Your Cost</span><span class="calc-val" id="c-cost">$0.00</span></div>
+            <div class="calc-row"><span class="calc-label">Retail Price</span><span class="calc-val" id="c-retail">$0.00</span></div>
+            <div class="calc-row"><span class="calc-label">Gross Profit</span><span class="calc-val" id="c-profit">$0.00</span></div>
+            <div class="calc-row"><span class="calc-label">Markup %</span><span class="calc-val" id="c-markup">0%</span></div>
+            <div class="calc-row"><span class="calc-label">Margin %</span><span class="calc-big" id="c-margin">0%</span></div>
+            <div class="margin-bar"><div class="margin-fill" id="margin-fill" style="width:0%"></div></div>
+            <div class="margin-verdict" id="margin-verdict"></div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-gold" onclick="addProduct()">Save Item</button>
+            <button class="btn btn-outline" onclick="clearForm()">Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVENTORY -->
+    <div id="pane-inventory" class="pane">
+      <div class="section">
+        <div class="sec-head">
+          <h2>📦 All Items</h2>
+          <button class="btn btn-green" style="font-size:.72rem;padding:.3rem .65rem" onclick="exportCSV()">Export CSV</button>
+        </div>
+        <div class="sec-body">
+          <div class="search-row">
+            <input type="text" id="search" placeholder="🔍 Name, item #, price..." oninput="renderInventory()">
+            <select id="filter-cat" onchange="renderInventory()">
+              <option value="">All Categories</option>
+              <option>Saree</option><option>Salwar Suit</option><option>Lehenga</option>
+              <option>Kurti</option><option>Dupatta</option><option>Dress Material</option>
+              <option>Indo-Western</option><option>Other</option>
+            </select>
+            <select id="filter-status" onchange="renderInventory()">
+              <option value="">All Status</option>
+              <option>Active</option><option>Sold</option>
+            </select>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr>
+                <th>Photo</th><th>Item #</th><th>Name</th><th>Cat</th>
+                <th>Cost</th><th>Retail</th><th>Profit</th><th>Margin</th>
+                <th>Status</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="inv-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SALES -->
+    <div id="pane-sales" class="pane">
+      <div class="section">
+        <div class="sec-head"><h2>💰 Sales Log</h2></div>
+        <div class="sec-body">
+          <div class="stats" style="margin-bottom:1rem">
+            <div class="stat"><div class="stat-val" id="sl-count">0</div><div class="stat-lbl">Sold</div></div>
+            <div class="stat"><div class="stat-val" id="sl-revenue" style="color:#64b5f6;font-size:1.05rem">$0</div><div class="stat-lbl">Revenue</div></div>
+            <div class="stat"><div class="stat-val" id="sl-profit" style="color:#66bb6a;font-size:1.05rem">$0</div><div class="stat-lbl">Profit</div></div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Date</th><th>Item #</th><th>Name</th><th>Cost</th><th>Sold For</th><th>Profit</th><th>Margin</th></tr></thead>
+              <tbody id="sales-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHARE -->
+    <div id="pane-share" class="pane">
+      <div class="section">
+        <div class="sec-head"><h2>📲 Share Tools</h2></div>
+        <div class="sec-body">
+          <div class="fg" style="margin-bottom:.85rem">
+            <label>Customer Catalog URL</label>
+            <input type="text" id="customer-url" placeholder="https://MTGStore.github.io/clothing-catalog/customer_catalog.html">
+          </div>
+          <div style="font-size:.8rem;font-weight:600;margin-bottom:.6rem;color:var(--offwhite)">WhatsApp message for a specific item:</div>
+          <div class="form-grid">
+            <div class="fg"><label>Select Item</label>
+              <select id="wa-item" onchange="buildWA()"><option value="">-- Pick an item --</option></select>
+            </div>
+            <div class="fg"><label>Custom note</label>
+              <input type="text" id="wa-msg" placeholder="New arrival! Limited stock." oninput="buildWA()">
+            </div>
+          </div>
+          <div class="wa-preview" id="wa-preview" style="display:none">
+            <strong style="display:block;margin-bottom:.3rem;font-size:.78rem">📋 Preview:</strong>
+            <div id="wa-text" style="white-space:pre-wrap;word-break:break-all;margin:.35rem 0;font-size:.77rem"></div>
+            <div class="btn-row">
+              <button class="btn btn-green" onclick="openWA()">Open WhatsApp</button>
+              <button class="btn btn-outline" onclick="copyWA()">Copy</button>
+            </div>
+          </div>
+          <div style="margin-top:1rem;padding:.85rem;background:rgba(194,24,91,.07);border-radius:var(--radius);border:1px solid rgba(194,24,91,.2)">
+            <strong style="color:var(--magenta);font-size:.8rem">📋 Blast Full Catalog</strong>
+            <p style="font-size:.75rem;color:#888;margin:.3rem 0 .7rem">Send the full Desi Vibes collection link to your WhatsApp group</p>
+            <button class="btn btn-saffron" onclick="sendCatalogWA()">Send Desi Vibes Catalog</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// Password: Gsp4046689091$ — stored as SHA-256 hash only
+const PWD_HASH='5858c36af834ccf98646267bec656e4b8b6788c880640ec6ed9d6bb6c2042022';
+const OWNER='Tupi Desai';
+
+async function hashStr(s){ const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)); return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+async function doLogin(){
+  const v=document.getElementById('pwd-input').value;
+  if(await hashStr(v)===PWD_HASH){ sessionStorage.setItem('auth','1'); document.getElementById('login-screen').style.display='none'; document.getElementById('app').style.display='block'; renderAll(); }
+  else{ document.getElementById('login-err').style.display='block'; document.getElementById('pwd-input').value=''; setTimeout(()=>document.getElementById('login-err').style.display='none',3000); }
+}
+function doLogout(){ sessionStorage.removeItem('auth'); location.reload(); }
+window.addEventListener('load',()=>{
+  if(sessionStorage.getItem('auth')==='1'){ document.getElementById('login-screen').style.display='none'; document.getElementById('app').style.display='block'; renderAll(); }
+  document.getElementById('pwd-input').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
+});
+
+let products=JSON.parse(localStorage.getItem('clothing_products')||'[]');
+let sales=JSON.parse(localStorage.getItem('clothing_sales')||'[]');
+let curImg='';
+
+function handleImgUpload(e){
+  const f=e.target.files[0]; if(!f) return;
+  if(f.size>5*1024*1024){alert('Max 5MB please.');return;}
+  const r=new FileReader(); r.onload=ev=>{ curImg=ev.target.result; showPreview(curImg); document.getElementById('f-img-url').value=''; }; r.readAsDataURL(f);
+}
+function handleUrlInput(){ const u=document.getElementById('f-img-url').value.trim(); if(u){curImg=u;showPreview(u);}else removeImg(); }
+function showPreview(src){ document.getElementById('img-preview').src=src; document.getElementById('img-preview').style.display='block'; document.getElementById('img-remove-btn').style.display='block'; document.getElementById('preview-wrap').style.display='block'; }
+function removeImg(){ curImg=''; document.getElementById('img-preview').src=''; document.getElementById('img-preview').style.display='none'; document.getElementById('img-remove-btn').style.display='none'; document.getElementById('preview-wrap').style.display='none'; document.getElementById('f-img-file').value=''; document.getElementById('f-img-url').value=''; }
+
+function switchTab(n,el){ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active')); el.classList.add('active'); document.getElementById('pane-'+n).classList.add('active'); if(n==='inventory') renderInventory(); if(n==='sales') renderSales(); if(n==='share') buildWASelect(); }
+
+function loadFromSheet(){
+  const url=document.getElementById('sheet-url').value.trim(); if(!url){alert('Paste your Google Sheet CSV URL first.');return;}
+  fetch(url).then(r=>r.text()).then(csv=>{
+    const rows=csv.trim().split('\n').slice(1); let n=0;
+    rows.forEach(row=>{ const c=row.split(',').map(x=>x.replace(/^"|"$/g,'').trim()); if(!c[0]) return;
+      const p={id:c[0],name:c[1],cat:c[2]||'Other',cost:parseFloat(c[3])||0,retail:parseFloat(c[4])||0,img:c[5]||'',qty:parseInt(c[6])||1,status:c[7]||'Active',notes:c[8]||'',added:new Date().toISOString()};
+      if(!products.find(x=>x.id===p.id)){products.push(p);n++;} });
+    save(); renderAll(); alert('Imported '+n+' new items!');
+  }).catch(()=>alert('Could not load. Check URL and make sure sheet is published as CSV.'));
+}
+
+function calcMargin(){
+  const cost=parseFloat(document.getElementById('f-cost').value)||0, retail=parseFloat(document.getElementById('f-retail').value)||0;
+  const profit=retail-cost, margin=retail>0?(profit/retail*100):0, markup=cost>0?(profit/cost*100):0;
+  document.getElementById('c-cost').textContent='$'+cost.toFixed(2);
+  document.getElementById('c-retail').textContent='$'+retail.toFixed(2);
+  document.getElementById('c-profit').textContent='$'+profit.toFixed(2);
+  document.getElementById('c-margin').textContent=margin.toFixed(1)+'%';
+  document.getElementById('c-markup').textContent=markup.toFixed(1)+'%';
+  document.getElementById('margin-fill').style.width=Math.min(margin,100)+'%';
+  const v=document.getElementById('margin-verdict');
+  if(margin>=60) v.textContent='✅ Excellent!'; else if(margin>=40) v.textContent='👍 Good margin'; else if(margin>=25) v.textContent='⚠️ Acceptable'; else if(retail>0) v.textContent='❌ Too thin'; else v.textContent='';
+}
+
+function addProduct(){
+  const id=document.getElementById('f-id').value.trim(), name=document.getElementById('f-name').value.trim();
+  const cost=parseFloat(document.getElementById('f-cost').value)||0, retail=parseFloat(document.getElementById('f-retail').value)||0;
+  if(!id||!name||!cost||!retail){alert('Fill in: Item Number, Name, Cost, and Retail Price.');return;}
+  if(products.find(p=>p.id===id)){alert('Item # '+id+' already exists.');return;}
+  products.push({id,name,cat:document.getElementById('f-cat').value,cost,retail,qty:parseInt(document.getElementById('f-qty').value)||1,img:curImg,notes:document.getElementById('f-notes').value.trim(),status:'Active',added:new Date().toISOString()});
+  save(); renderAll(); clearForm(); alert('✅ "'+name+'" added to Desi Vibes!');
+}
+function clearForm(){ ['f-id','f-name','f-cost','f-retail','f-notes','f-img-url'].forEach(id=>document.getElementById(id).value=''); document.getElementById('f-qty').value='1'; removeImg(); calcMargin(); }
+
+function markSold(id){
+  const p=products.find(x=>x.id===id); if(!p) return;
+  const raw=prompt('Sold price for "'+p.name+'"?\n(Press OK for retail: $'+p.retail+')',p.retail); if(raw===null) return;
+  const sp=parseFloat(raw); if(isNaN(sp)||sp<0){alert('Invalid price.');return;}
+  p.status='Sold';
+  sales.push({date:new Date().toLocaleDateString(),id:p.id,name:p.name,cost:p.cost,price:sp,profit:sp-p.cost,margin:((sp-p.cost)/sp*100).toFixed(1)});
+  save(); renderAll(); renderInventory(); alert('✅ Marked as Sold Out on Desi Vibes.');
+}
+function relistItem(id){
+  const p=products.find(x=>x.id===id); if(!p) return;
+  if(!confirm('Relist "'+p.name+'" as Available?')) return;
+  p.status='Active'; save(); renderAll(); renderInventory(); alert('✅ Item is now Active on Desi Vibes!');
+}
+function deleteProduct(id){ if(!confirm('Permanently delete item '+id+'?')) return; products=products.filter(p=>p.id!==id); save(); renderAll(); renderInventory(); }
+
+function renderInventory(){
+  const search=(document.getElementById('search')||{value:''}).value.toLowerCase();
+  const cat=(document.getElementById('filter-cat')||{value:''}).value;
+  const status=(document.getElementById('filter-status')||{value:''}).value;
+  let list=products.filter(p=>{
+    if(search&&!p.name.toLowerCase().includes(search)&&!p.id.toLowerCase().includes(search)&&!String(p.retail).includes(search)) return false;
+    if(cat&&p.cat!==cat) return false; if(status&&p.status!==status) return false; return true;
+  });
+  const body=document.getElementById('inv-body');
+  if(!list.length){body.innerHTML='<tr><td colspan="10" style="text-align:center;color:#555;padding:2rem">No items found</td></tr>';return;}
+  body.innerHTML=list.map(p=>{
+    const profit=(p.retail-p.cost).toFixed(2), margin=(p.retail>0?(p.retail-p.cost)/p.retail*100:0).toFixed(1);
+    const imgHtml=p.img?`<img src="${p.img}" class="img-thumb" onerror="this.outerHTML='<div class=img-ph>👗</div>'">`:`<div class="img-ph">👗</div>`;
+    const isSold=p.status==='Sold';
+    return `<tr><td>${imgHtml}</td><td style="color:var(--gold);font-weight:600">${p.id}</td>
+      <td>${p.name}${p.notes?`<br><span style="font-size:.65rem;color:#555">${p.notes.substring(0,40)}${p.notes.length>40?'…':''}</span>`:''}</td>
+      <td><span style="font-size:.68rem;background:rgba(0,137,123,.12);color:var(--teal);padding:2px 6px;border-radius:8px;border:1px solid rgba(0,137,123,.2)">${p.cat}</span></td>
+      <td>$${p.cost.toFixed(2)}</td><td style="color:var(--gold);font-weight:600">$${p.retail.toFixed(2)}</td>
+      <td style="color:#66bb6a;font-weight:600">$${profit}</td>
+      <td style="color:${margin>=50?'#66bb6a':margin>=30?'#fb8c00':'var(--magenta)';font-weight:600}">${margin}%</td>
+      <td><span class="badge badge-${isSold?'sold':'active'}">${isSold?'Sold Out':'Active'}</span></td>
+      <td>${!isSold?`<button class="act-btn act-sell" onclick="markSold('${p.id}')">Sold</button>`:''}${isSold?`<button class="act-btn act-relist" onclick="relistItem('${p.id}')">Relist</button>`:''}
+      <button class="act-btn act-del" onclick="deleteProduct('${p.id}')">Del</button></td></tr>`;
+  }).join('');
+}
+
+function renderSales(){
+  const body=document.getElementById('sales-body');
+  if(!sales.length){body.innerHTML='<tr><td colspan="7" style="text-align:center;color:#555;padding:2rem">No sales yet</td></tr>';return;}
+  let rev=0,prof=0;
+  body.innerHTML=[...sales].reverse().map(s=>{ rev+=s.price; prof+=s.profit;
+    return `<tr><td>${s.date}</td><td style="color:var(--gold)">${s.id}</td><td>${s.name}</td><td>$${s.cost.toFixed(2)}</td><td>$${s.price.toFixed(2)}</td><td style="color:#66bb6a;font-weight:600">$${s.profit.toFixed(2)}</td><td>${s.margin}%</td></tr>`;
+  }).join('');
+  document.getElementById('sl-count').textContent=sales.length;
+  document.getElementById('sl-revenue').textContent='$'+rev.toFixed(2);
+  document.getElementById('sl-profit').textContent='$'+prof.toFixed(2);
+}
+
+function renderDashboard(){
+  const active=products.filter(p=>p.status==='Active'), sold=products.filter(p=>p.status==='Sold');
+  const invest=active.reduce((a,p)=>a+p.cost*p.qty,0), retail=active.reduce((a,p)=>a+p.retail*p.qty,0);
+  document.getElementById('s-total').textContent=products.length;
+  document.getElementById('s-active').textContent=active.length;
+  document.getElementById('s-sold').textContent=sold.length;
+  document.getElementById('s-invest').textContent='$'+invest.toFixed(0);
+  document.getElementById('s-retail').textContent='$'+retail.toFixed(0);
+  document.getElementById('s-profit').textContent='$'+(retail-invest).toFixed(0);
+  const el=document.getElementById('recent-list');
+  if(!products.length){el.innerHTML='<div style="text-align:center;color:#555;padding:2rem">No products yet.</div>';return;}
+  el.innerHTML=[...products].reverse().slice(0,6).map(p=>{
+    const isSold=p.status==='Sold';
+    return `<div style="display:flex;align-items:center;gap:.75rem;padding:.55rem 0;border-bottom:1px solid rgba(201,151,58,.08)">
+      ${p.img?`<img src="${p.img}" style="width:34px;height:43px;object-fit:cover;border-radius:3px;flex-shrink:0;border:1px solid var(--border)">`:`<div style="width:34px;height:43px;background:#1a1000;border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.85rem">👗</div>`}
+      <div style="flex:1;min-width:0"><div style="font-weight:500;font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--offwhite)">${p.name} <span style="font-size:.7rem;color:#555">#${p.id}</span></div>
+      <div style="font-size:.72rem;color:#555">${p.cat} · Cost $${p.cost} · Retail $${p.retail}</div></div>
+      <div style="text-align:right;flex-shrink:0"><div style="font-weight:700;color:${isSold?'var(--saffron)':'#66bb6a'};font-size:.8rem">${isSold?'Sold Out':'$'+(p.retail-p.cost).toFixed(2)}</div>
+      <div style="font-size:.68rem;color:#555">${p.retail>0?((p.retail-p.cost)/p.retail*100).toFixed(1):0}% margin</div></div>
+    </div>`;
+  }).join('');
+}
+
+function buildWASelect(){ document.getElementById('wa-item').innerHTML='<option value="">-- Pick an item --</option>'+products.map(p=>`<option value="${p.id}">${p.id} — ${p.name}${p.status==='Sold'?' (Sold Out)':''}</option>`).join(''); }
+function buildWA(){
+  const p=products.find(x=>x.id===document.getElementById('wa-item').value); if(!p){document.getElementById('wa-preview').style.display='none';return;}
+  const cu=document.getElementById('customer-url').value||'[Your catalog URL]';
+  const msg=document.getElementById('wa-msg').value||'New arrival at Desi Vibes! Limited stock.';
+  document.getElementById('wa-text').textContent=`✦ *Desi Vibes*\n_Where Tradition Meets Trend_\n\n👗 *${p.name}*\n🏷️ Item # ${p.id}\n💰 Price: $${p.retail}\n📦 ${p.cat}${p.notes?'\n📝 '+p.notes:''}\n\n${msg}\n\n🔗 Browse full collection:\n${cu}\n\n_Reply to order!_ 🎉`;
+  document.getElementById('wa-preview').style.display='block';
+}
+function openWA(){ window.open('https://wa.me/?text='+encodeURIComponent(document.getElementById('wa-text').textContent),'_blank'); }
+function copyWA(){ navigator.clipboard.writeText(document.getElementById('wa-text').textContent); alert('Copied!'); }
+function sendCatalogWA(){
+  const cu=document.getElementById('customer-url').value||'[Your catalog URL]';
+  const avail=products.filter(p=>p.status==='Active').length;
+  window.open('https://wa.me/?text='+encodeURIComponent(`✦ *DESI VIBES — NEW COLLECTION!* ✦\n_Where Tradition Meets Trend_\n\n👗 Authentic Indian fashion handpicked for you!\n\n🔗 Browse & shop: ${cu}\n\n📦 ${avail} pieces available now\n🛍️ Add to cart · Order via WhatsApp\n\n_Sarees · Salwar Suits · Lehenghas · Kurtis & More!_\n\n— ${OWNER}`),'_blank');
+}
+
+function exportCSV(){
+  const rows=[['Item_ID','Item_Name','Category','Cost','Retail','Image_URL','Qty','Status','Notes']];
+  products.forEach(p=>rows.push([p.id,'"'+p.name+'"',p.cat,p.cost,p.retail,p.img||'',p.qty,p.status,'"'+(p.notes||'')+'"']));
+  const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(rows.map(r=>r.join(',')).join('\n')); a.download='desi_vibes_'+new Date().toISOString().split('T')[0]+'.csv'; a.click();
+}
+function save(){ localStorage.setItem('clothing_products',JSON.stringify(products)); localStorage.setItem('clothing_sales',JSON.stringify(sales)); }
+function renderAll(){ renderDashboard(); renderInventory(); renderSales(); }
+</script>
+</body>
+</html>
