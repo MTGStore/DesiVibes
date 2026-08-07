@@ -178,7 +178,7 @@ tr:hover td{background:rgba(201,151,58,.03)}
 
   <div style="padding:.75rem 1rem 0;max-width:1100px;margin:0 auto">
     <div class="sheet-config">
-      <span class="sheet-lbl">📊 Google Sheet CSV:</span>
+      <span class="sheet-lbl">📊 Google Sheet:</span>
       <input type="text" id="sheet-url" placeholder="Paste published CSV URL...">
       <button class="btn btn-gold" onclick="loadFromSheet()">Sync</button>
     </div>
@@ -366,6 +366,7 @@ tr:hover td{background:rgba(201,151,58,.03)}
 <script>
 // Password obfuscated — works on HTTP and HTTPS
 const _k = atob(atob('UjNOd05EQTBOalk0T1RBNU1TUT0='));
+const API_URL = 'https://script.google.com/macros/s/AKfycbzculngSTM7SLtazn_NekwhorIJwGrVLCBExkxYL7L30cIgRnhATlo8gi2dpS0IUkE4/exec';
 const OWNER='Tupi Desai';
 
 function doLogin(){
@@ -423,8 +424,11 @@ function addProduct(){
   const cost=parseFloat(document.getElementById('f-cost').value)||0, retail=parseFloat(document.getElementById('f-retail').value)||0;
   if(!id||!name||!cost||!retail){alert('Fill in: Item Number, Name, Cost, and Retail Price.');return;}
   if(products.find(p=>p.id===id)){alert('Item # '+id+' already exists.');return;}
-  products.push({id,name,cat:document.getElementById('f-cat').value,cost,retail,qty:parseInt(document.getElementById('f-qty').value)||1,img:curImg,notes:document.getElementById('f-notes').value.trim(),status:'Active',added:new Date().toISOString()});
-  save(); renderAll(); clearForm(); alert('✅ "'+name+'" added to Desi Vibes!');
+  const newP={id,name,cat:document.getElementById('f-cat').value,cost,retail,qty:parseInt(document.getElementById('f-qty').value)||1,img:curImg,notes:document.getElementById('f-notes').value.trim(),status:'Active',added:new Date().toISOString()};
+  products.push(newP);
+  save();
+  saveToSheet(newP);
+  renderAll(); clearForm(); alert('✅ "'+name+'" added to Desi Vibes!');
 }
 function clearForm(){ ['f-id','f-name','f-cost','f-retail','f-notes','f-img-url'].forEach(id=>document.getElementById(id).value=''); document.getElementById('f-qty').value='1'; removeImg(); calcMargin(); }
 
@@ -434,14 +438,16 @@ function markSold(id){
   const sp=parseFloat(raw); if(isNaN(sp)||sp<0){alert('Invalid price.');return;}
   p.status='Sold';
   sales.push({date:new Date().toLocaleDateString(),id:p.id,name:p.name,cost:p.cost,price:sp,profit:sp-p.cost,margin:((sp-p.cost)/sp*100).toFixed(1)});
-  save(); renderAll(); renderInventory(); alert('✅ Marked as Sold Out on Desi Vibes.');
+  save();
+  saveToSheet(p);
+  renderAll(); renderInventory(); alert('✅ Marked as Sold Out on Desi Vibes.');
 }
 function relistItem(id){
   const p=products.find(x=>x.id===id); if(!p) return;
   if(!confirm('Relist "'+p.name+'" as Available?')) return;
-  p.status='Active'; save(); renderAll(); renderInventory(); alert('✅ Item is now Active on Desi Vibes!');
+  p.status='Active'; save(); saveToSheet(p); renderAll(); renderInventory(); alert('✅ Item is now Active on Desi Vibes!');
 }
-function deleteProduct(id){ if(!confirm('Permanently delete item '+id+'?')) return; products=products.filter(p=>p.id!==id); save(); renderAll(); renderInventory(); }
+function deleteProduct(id){ if(!confirm('Permanently delete item '+id+'?')) return; products=products.filter(p=>p.id!==id); save(); deleteFromSheet(id); renderAll(); renderInventory(); }
 
 function renderInventory(){
   const search=(document.getElementById('search')||{value:''}).value.toLowerCase();
@@ -525,7 +531,86 @@ function exportCSV(){
   products.forEach(p=>rows.push([p.id,'"'+p.name+'"',p.cat,p.cost,p.retail,p.img||'',p.qty,p.status,'"'+(p.notes||'')+'"']));
   const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(rows.map(r=>r.join(',')).join('\n')); a.download='desi_vibes_'+new Date().toISOString().split('T')[0]+'.csv'; a.click();
 }
-function save(){ localStorage.setItem('clothing_products',JSON.stringify(products)); localStorage.setItem('clothing_sales',JSON.stringify(sales)); }
+function save(){
+  // Always save to localStorage first (instant, works offline)
+  localStorage.setItem('clothing_products',JSON.stringify(products));
+  localStorage.setItem('clothing_sales',JSON.stringify(sales));
+}
+
+// Save a single product to Google Sheet
+function saveToSheet(product){
+  if(!API_URL) return;
+  fetch(API_URL, {
+    method:'POST',
+    body: JSON.stringify({ action:'write', product: product })
+  }).catch(()=>{}); // silent fail — localStorage is the backup
+}
+
+// Delete a product from Google Sheet
+function deleteFromSheet(id){
+  if(!API_URL) return;
+  fetch(API_URL, {
+    method:'POST',
+    body: JSON.stringify({ action:'delete', id: id })
+  }).catch(()=>{});
+}
+
+// Sync ALL localStorage products to Sheet (run once to migrate existing data)
+async function syncAllToSheet(){
+  if(!API_URL){ alert('No API URL set.'); return; }
+  const btn = document.getElementById('sync-btn');
+  if(btn) btn.textContent = 'Syncing...';
+  try {
+    const res = await fetch(API_URL, {
+      method:'POST',
+      body: JSON.stringify({ action:'sync', products: products })
+    });
+    const data = await res.json();
+    if(data.success){
+      alert('✅ Synced ' + data.synced + ' products to Google Sheet!');
+    } else {
+      alert('Sync error: ' + data.error);
+    }
+  } catch(e){
+    alert('Network error. Check your internet connection.');
+  }
+  if(btn) btn.textContent = 'Sync to Sheet';
+}
+
+// Load products from Google Sheet (replaces localStorage)
+async function loadFromSheetAPI(){
+  if(!API_URL) return;
+  const btn = document.getElementById('load-sheet-btn');
+  if(btn){ btn.textContent = 'Loading...'; btn.disabled = true; }
+  try {
+    const res = await fetch(API_URL + '?action=read');
+    const data = await res.json();
+    if(data.success && data.data.length > 0){
+      // Map sheet columns to product objects
+      const loaded = data.data.map(row => ({
+        id:     String(row['Item_ID']   || row['id']     || ''),
+        name:   String(row['Item_Name'] || row['name']   || ''),
+        cat:    String(row['Category']  || row['cat']    || 'Other'),
+        cost:   parseFloat(row['Cost']  || row['cost']   || 0),
+        retail: parseFloat(row['Retail']|| row['retail'] || 0),
+        img:    String(row['Image_URL'] || row['img']    || ''),
+        qty:    parseInt(row['Qty']     || row['qty']    || 1),
+        status: String(row['Status']    || row['status'] || 'Active'),
+        notes:  String(row['Notes']     || row['notes']  || ''),
+        added:  String(row['added']     || new Date().toISOString())
+      })).filter(p => p.id && p.name);
+      products = loaded;
+      save();
+      renderAll();
+      alert('✅ Loaded ' + loaded.length + ' products from Google Sheet!');
+    } else {
+      alert('Sheet is empty or no products found. Add products via the admin panel and sync them.');
+    }
+  } catch(e){
+    alert('Could not reach Google Sheet. Check your internet connection.');
+  }
+  if(btn){ btn.textContent = 'Load from Sheet'; btn.disabled = false; }
+}
 function renderAll(){ renderDashboard(); renderInventory(); renderSales(); }
 </script>
 </body>
