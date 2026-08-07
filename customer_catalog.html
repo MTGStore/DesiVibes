@@ -289,13 +289,47 @@ const API_URL='https://script.google.com/macros/s/AKfycbzculngSTM7SLtazn_Nekwhor
 let allP=[],cart=[],activeCat='',curItem=null;
 
 function loadData(){
+  // Show localStorage immediately for fast load
   const loc=JSON.parse(localStorage.getItem('clothing_products')||'[]');
   if(loc.length){allP=loc;renderGrid();}
-  if(SHEET_CSV_URL)loadSheet();
-  setInterval(()=>{if(SHEET_CSV_URL)loadSheet();else{allP=JSON.parse(localStorage.getItem('clothing_products')||'[]');renderGrid();}},60000);
+  // Then fetch fresh from Google Sheet
+  loadFromAPI();
+  // Auto-refresh every 60 seconds
+  setInterval(loadFromAPI, 60000);
+}
+
+function loadFromAPI(){
+  if(!API_URL) return;
+  fetch(API_URL+'?action=read&t='+Date.now(), {redirect:'follow'})
+    .then(r=>r.json())
+    .then(data=>{
+      if(data.success && data.data && data.data.length>0){
+        const loaded=data.data.map(row=>({
+          id:     String(row['Item_ID']   || row['id']    || ''),
+          name:   String(row['Item_Name'] || row['name']  || ''),
+          batch:  String(row['Batch']     || row['batch'] || ''),
+          cat:    String(row['Category']  || row['cat']   || 'Other'),
+          retail: parseFloat(row['Retail']|| row['retail']|| 0),
+          img:    String(row['Image_URL'] || row['img']   || ''),
+          qty:    parseInt(row['Qty']     || row['qty']   || 1),
+          status: String(row['Status']    || row['status']|| 'Active'),
+          notes:  String(row['Notes']     || row['notes'] || '')
+        })).filter(p=>p.id&&p.name);
+        if(loaded.length){
+          allP=loaded;
+          localStorage.setItem('clothing_products',JSON.stringify(loaded));
+          renderGrid();
+        }
+      }
+    })
+    .catch(()=>{
+      // Silently fall back to localStorage
+    });
 }
 
 function loadSheet(){
+  // Legacy CSV method — kept as fallback
+  if(!SHEET_CSV_URL) return;
   fetch(SHEET_CSV_URL+'&t='+Date.now()).then(r=>r.text()).then(csv=>{
     const rows=csv.trim().split('\n').slice(1),loaded=[];
     rows.forEach(row=>{const c=row.split(',').map(x=>x.replace(/^"|"$/g,'').trim());if(!c[0])return;
