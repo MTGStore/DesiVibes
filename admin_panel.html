@@ -178,10 +178,17 @@ tr:hover td{background:rgba(201,151,58,.03)}
 
   <div style="padding:.65rem 1rem 0;max-width:1100px;margin:0 auto">
     <div style="background:rgba(46,125,50,.1);border:1px solid rgba(46,125,50,.25);border-radius:var(--radius);padding:.65rem 1rem;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
-      <span style="font-size:.75rem;color:#66bb6a;font-weight:600">✅ Google Sheet Connected — Data saves automatically</span>
-      <div style="display:flex;gap:.5rem;margin-left:auto;flex-wrap:wrap">
-        <button class="btn btn-gold" id="sync-btn" onclick="syncAllToSheet()" style="font-size:.75rem;padding:.38rem .85rem">⬆ Sync All to Sheet</button>
-        <button class="btn btn-outline" id="load-sheet-btn" onclick="loadFromSheetAPI()" style="font-size:.75rem;padding:.38rem .85rem">⬇ Load from Sheet</button>
+      <span style="font-size:.75rem;color:#66bb6a;font-weight:600">✅ Google Sheet Connected</span>
+      <div style="display:flex;align-items:center;gap:.4rem;flex:1;min-width:0">
+        <span style="font-size:.68rem;color:var(--muted);flex-shrink:0">ImgBB Key:</span>
+        <input type="text" id="imgbb-key" placeholder="Paste your ImgBB API key"
+          style="flex:1;min-width:80px;max-width:200px;padding:.28rem .5rem;background:var(--card2);border:1px solid var(--border);border-radius:3px;font-size:.7rem;color:var(--offwhite);outline:none"
+          oninput="localStorage.setItem('imgbb_key',this.value)"
+          value="">
+      </div>
+      <div style="display:flex;gap:.5rem;flex-shrink:0">
+        <button class="btn btn-gold" id="sync-btn" onclick="syncAllToSheet()" style="font-size:.75rem;padding:.38rem .85rem">⬆ Sync All</button>
+        <button class="btn btn-outline" id="load-sheet-btn" onclick="loadFromSheetAPI()" style="font-size:.75rem;padding:.38rem .85rem">⬇ Load</button>
       </div>
     </div>
   </div>
@@ -252,12 +259,13 @@ tr:hover td{background:rgba(201,151,58,.03)}
             <div class="fg"><label>Qty</label><input type="number" id="f-qty" value="1" min="1"></div>
             <div class="fg" style="grid-column:1/-1">
               <label>Product Photo</label>
-              <div class="img-zone">
+              <div class="img-zone" id="img-zone-wrap">
                 <input type="file" id="f-img-file" accept="image/*" onchange="handleImgUpload(event)">
-                <span class="img-zone-icon">📷</span>
-                <div class="img-zone-txt">Tap to upload photo</div>
-                <div class="img-zone-sub">JPG · PNG · WEBP · Max 5MB · Phone camera or gallery</div>
+                <span class="img-zone-icon" id="img-zone-icon">📷</span>
+                <div class="img-zone-txt" id="img-zone-txt">Tap to upload photo</div>
+                <div class="img-zone-sub">JPG · PNG · WEBP · Max 5MB · Uploads automatically</div>
               </div>
+              <div id="img-upload-status" style="display:none;margin-top:.4rem;font-size:.75rem;padding:.4rem .65rem;border-radius:4px;font-weight:600"></div>
               <div id="preview-wrap" style="display:none;margin-top:.6rem">
                 <div style="position:relative;display:inline-block">
                   <img id="img-preview" class="img-preview" src="" alt="Preview" style="display:block">
@@ -397,6 +405,9 @@ function doLogin(){
 }
 function doLogout(){ sessionStorage.removeItem('auth'); location.reload(); }
 window.addEventListener('load',()=>{
+  // Load saved ImgBB key
+  const savedKey=localStorage.getItem('imgbb_key');
+  if(savedKey){const kf=document.getElementById('imgbb-key');if(kf)kf.value=savedKey;}
   // Auto-load from sheet on login
   setTimeout(()=>{ if(API_URL) loadFromSheetAPI(); }, 1500);
   if(sessionStorage.getItem('auth')==='1'){ document.getElementById('login-screen').style.display='none'; document.getElementById('app').style.display='block'; renderAll(); }
@@ -407,10 +418,42 @@ let products=JSON.parse(localStorage.getItem('clothing_products')||'[]');
 let sales=JSON.parse(localStorage.getItem('clothing_sales')||'[]');
 let curImg='';
 
-function handleImgUpload(e){
+async function handleImgUpload(e){
   const f=e.target.files[0]; if(!f) return;
   if(f.size>5*1024*1024){alert('Max 5MB please.');return;}
-  const r=new FileReader(); r.onload=ev=>{ curImg=ev.target.result; showPreview(curImg); document.getElementById('f-img-url').value=''; }; r.readAsDataURL(f);
+  const icon=document.getElementById('img-zone-icon');
+  const txt=document.getElementById('img-zone-txt');
+  const status=document.getElementById('img-upload-status');
+  if(icon)icon.textContent='⏳';
+  if(txt)txt.textContent='Uploading...';
+  const IMGBB_KEY=(document.getElementById('imgbb-key')||{value:''}).value.trim()||localStorage.getItem('imgbb_key')||'';
+  if(IMGBB_KEY){
+    try{
+      const b64=await new Promise((res,rej)=>{const rd=new FileReader();rd.onload=ev=>res(ev.target.result.split(',')[1]);rd.onerror=rej;rd.readAsDataURL(f);});
+      const fd=new FormData();fd.append('key',IMGBB_KEY);fd.append('image',b64);fd.append('name','DV_'+(document.getElementById('f-id').value||Date.now()));
+      const res=await fetch('https://api.imgbb.com/1/upload',{method:'POST',body:fd});
+      const data=await res.json();
+      if(data.success){
+        curImg=data.data.url;
+        document.getElementById('f-img-url').value=curImg;
+        showPreview(curImg);
+        if(icon)icon.textContent='✅';if(txt)txt.textContent='Uploaded!';
+        if(status){status.style.cssText='display:block;background:rgba(46,125,50,.12);color:#66bb6a;border:1px solid rgba(46,125,50,.3);padding:.35rem .6rem;border-radius:4px;font-size:.72rem;margin-top:.4rem';status.textContent='✅ Photo uploaded — URL saved to Google Sheet';}
+        return;
+      } else throw new Error('fail');
+    } catch(err){
+      if(status){status.style.cssText='display:block;background:rgba(194,24,91,.1);color:#e91e8c;border:1px solid rgba(194,24,91,.3);padding:.35rem .6rem;border-radius:4px;font-size:.72rem;margin-top:.4rem';status.textContent='❌ Upload failed. Check ImgBB key or try URL method below.';}
+    }
+  }
+  // Fallback to base64 (local only)
+  const rd=new FileReader();
+  rd.onload=ev=>{
+    curImg=ev.target.result; showPreview(curImg);
+    if(icon)icon.textContent='📷';if(txt)txt.textContent='Saved locally';
+    if(status){status.style.cssText='display:block;background:rgba(251,140,0,.1);color:#fb8c00;border:1px solid rgba(251,140,0,.3);padding:.35rem .6rem;border-radius:4px;font-size:.72rem;margin-top:.4rem';
+    status.textContent=IMGBB_KEY?'⚠️ Upload failed — photo saved locally only':'⚠️ No ImgBB key — photo local only. Will NOT appear on website after sync.';}
+  };
+  rd.readAsDataURL(f);
 }
 function handleUrlInput(){ const u=document.getElementById('f-img-url').value.trim(); if(u){curImg=u;showPreview(u);}else removeImg(); }
 function showPreview(src){ document.getElementById('img-preview').src=src; document.getElementById('img-preview').style.display='block'; document.getElementById('img-remove-btn').style.display='block'; document.getElementById('preview-wrap').style.display='block'; }
@@ -590,7 +633,13 @@ function sheetGet(action){
 // Save a single product to Google Sheet
 function saveToSheet(product){
   if(!API_URL) return;
-  sheetPost({action:'write', product:product}).catch(()=>{});
+  // Strip base64 images before sending to sheet — they're too large
+  // Only send real URLs (http/https)
+  const p={...product};
+  if(p.img && p.img.startsWith('data:')){
+    p.img=''; // base64 can't go to sheet — use ImgBB for real URLs
+  }
+  sheetPost({action:'write', product:p}).catch(()=>{});
 }
 
 // Delete a product from Google Sheet
@@ -605,7 +654,12 @@ async function syncAllToSheet(){
   const btn = document.getElementById('sync-btn');
   if(btn) btn.textContent = 'Syncing...';
   try {
-    const res = await sheetPost({ action:'sync', products: products });
+    // Strip base64 images before syncing — too large for sheet cells
+    const cleanProducts = products.map(p => ({
+      ...p,
+      img: (p.img && p.img.startsWith('data:')) ? '' : (p.img||'')
+    }));
+    const res = await sheetPost({ action:'sync', products: cleanProducts });
     const data = await res.json();
     if(data.success){
       alert('✅ Synced ' + data.synced + ' products to Google Sheet!');
