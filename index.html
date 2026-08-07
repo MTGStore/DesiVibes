@@ -5,289 +5,467 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="theme-color" content="#000000">
 <title>Desi Vibes — Where Tradition Meets Trend</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --gold:#C9973A;--gold-bright:#e8b84b;--gold-dim:#8a6520;
-  --gold-border:rgba(201,151,58,.5);--magenta:#C2185B;--teal:#00897B;--black:#080808;
+  --gold:#C9973A;--gold-bright:#f0c84a;--gold-dim:#7a5818;
+  --magenta:#C2185B;--teal:#00897B;--black:#000;
 }
-html,body{width:100%;height:100%;overflow:hidden}
-body{background:var(--black);display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;min-height:100vh}
+html,body{width:100%;height:100%;overflow:hidden;background:#000}
+body{display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:'Inter',sans-serif}
 
-.bg-glow{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 38%,rgba(201,151,58,.09) 0%,transparent 65%);pointer-events:none}
-
-/* PARTICLES */
-.particles{position:fixed;inset:0;pointer-events:none;overflow:hidden}
-.particle{position:absolute;border-radius:50%;opacity:0;animation:float-up var(--dur) var(--delay) infinite ease-in}
-@keyframes float-up{0%{opacity:0;transform:translateY(0)}20%{opacity:.5}80%{opacity:.15}100%{opacity:0;transform:translateY(-100vh)}}
-
-/* SPLASH */
-.splash{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem 1.5rem;position:relative;z-index:10;width:100%}
-
-/* ── LOGO STAGE ── */
-.logo-stage{
-  position:relative;
-  width:min(220px,60vw);
-  height:min(220px,60vw);
-  margin:0 auto 1.75rem;
-  overflow:visible; /* important so zoom doesn't clip */
+/* ── CINEMATIC BLACK BARS ── */
+.bar-top,.bar-bottom{
+  position:fixed;left:0;right:0;
+  background:#000;z-index:50;
+  transition:height 1.2s 3.5s cubic-bezier(.76,0,.24,1);
 }
+.bar-top{top:0;height:18vh}
+.bar-bottom{bottom:0;height:18vh}
+.bar-top.open,.bar-bottom.open{height:0}
 
-/*
-  LOGO SEQUENCE:
-  0.0 – 0.4s  → pop in (scale 0 to 1)
-  0.4 – 1.1s  → slow zoom to 2×
-  1.1 – 1.6s  → hold
-  1.6 – 2.4s  → zoom back to 1×
-  2.4 – 4.4s  → side-to-side swing (pendulum, 2 full swings)
-  4.4s+       → gentle glow pulse
-*/
-.logo-img{
+/* ── CANVAS for particles ── */
+#canvas{position:fixed;inset:0;z-index:1}
+
+/* ── LIGHT RAYS ── */
+.rays{
+  position:fixed;inset:0;z-index:2;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+}
+.ray{
   position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  /* No border-radius — show full logo including black background */
+  width:2px;
+  height:55vh;
+  top:50%;left:50%;
+  transform-origin:top center;
+  background:linear-gradient(to bottom,rgba(201,151,58,.0),rgba(201,151,58,.18),rgba(201,151,58,.0));
+  border-radius:2px;
+}
+.rays.show{opacity:1;animation:rays-pulse 2s ease-in-out infinite alternate}
+@keyframes rays-pulse{0%{opacity:.5}100%{opacity:1}}
+
+/* ── CENTER GLOW ── */
+.center-glow{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:300px;height:300px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(201,151,58,.35) 0%,rgba(201,151,58,.08) 40%,transparent 70%);
+  z-index:2;opacity:0;pointer-events:none;
+  transition:opacity .8s;
+}
+.center-glow.show{opacity:1}
+
+/* ── LOGO CONTAINER ── */
+.logo-wrap{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  z-index:10;
+  display:flex;flex-direction:column;align-items:center;
   opacity:0;
-  transform-origin:center center;
-  animation:
-    logo-sequence 4.4s 0.1s ease-in-out forwards,
-    logo-glow 3s 4.6s ease-in-out infinite;
+  transition:opacity 1s;
+}
+.logo-wrap.show{opacity:1}
+
+.logo-img-wrap{position:relative;width:min(200px,52vw);height:min(200px,52vw)}
+.logo-img{
+  width:100%;height:100%;object-fit:contain;
+  display:block;
+  filter:drop-shadow(0 0 30px rgba(201,151,58,.7)) drop-shadow(0 0 80px rgba(201,151,58,.3));
+  animation:logo-breathe 3s ease-in-out infinite;
+}
+@keyframes logo-breathe{
+  0%,100%{filter:drop-shadow(0 0 20px rgba(201,151,58,.5)) drop-shadow(0 0 50px rgba(201,151,58,.2))}
+  50%{filter:drop-shadow(0 0 40px rgba(201,151,58,.9)) drop-shadow(0 0 100px rgba(201,151,58,.4))}
 }
 
-@keyframes logo-sequence{
-  /* Pop in */
-  0%   { opacity:0; transform:scale(0); }
-  9%   { opacity:1; transform:scale(1); }
-  /* Zoom IN to 2× */
-  25%  { transform:scale(2); }
-  /* Hold */
-  36%  { transform:scale(2); }
-  /* Zoom OUT back to 1× */
-  55%  { transform:scale(1); }
-  /* Side-to-side swing — like a gentle pendulum */
-  55%  { transform:scale(1) rotate(0deg); }
-  65%  { transform:scale(1) rotate(18deg); }
-  75%  { transform:scale(1) rotate(-18deg); }
-  83%  { transform:scale(1) rotate(12deg); }
-  90%  { transform:scale(1) rotate(-12deg); }
-  96%  { transform:scale(1) rotate(4deg); }
-  100% { transform:scale(1) rotate(0deg); }
-}
-
-@keyframes logo-glow{
-  0%,100%{filter:drop-shadow(0 0 14px rgba(201,151,58,.35)) drop-shadow(0 0 35px rgba(201,151,58,.12))}
-  50%{filter:drop-shadow(0 0 30px rgba(201,151,58,.7)) drop-shadow(0 0 65px rgba(201,151,58,.3))}
-}
-
-/* ── GOLD RING around logo — visible, prominent ── */
+/* Gold ring */
 .logo-ring{
   position:absolute;
-  inset:-4px; /* sits just outside the logo */
-  border-radius:50%;
-  border:2px solid var(--gold);
-  opacity:0;
-  box-shadow:
-    0 0 12px rgba(201,151,58,.5),
-    inset 0 0 12px rgba(201,151,58,.15);
-  animation:ring-appear .8s 0.3s forwards;
+  inset:-8px;border-radius:50%;
+  border:1.5px solid rgba(201,151,58,.6);
+  box-shadow:0 0 16px rgba(201,151,58,.4),inset 0 0 16px rgba(201,151,58,.1);
+  animation:ring-spin 8s linear infinite;
 }
-/* Spinning decorative ring outside the solid one */
-.ring-spin{
-  position:absolute;
-  inset:-14px;
-  border-radius:50%;
-  border:1px dashed rgba(201,151,58,.4);
-  border-top-color:var(--gold);
-  opacity:0;
-  animation:ring-appear .6s 0.5s forwards, spin-cw 6s 0.5s linear infinite;
+.logo-ring2{
+  position:absolute;inset:-16px;border-radius:50%;
+  border:1px dashed rgba(201,151,58,.3);
+  animation:ring-spin 14s linear infinite reverse;
 }
-.ring-spin2{
-  position:absolute;
-  inset:-22px;
-  border-radius:50%;
-  border:1px solid rgba(201,151,58,.18);
-  border-bottom-color:rgba(201,151,58,.5);
-  opacity:0;
-  animation:ring-appear .6s 0.7s forwards, spin-ccw 9s 0.7s linear infinite;
-}
+@keyframes ring-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 
-@keyframes ring-appear{to{opacity:1}}
-@keyframes spin-cw{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-@keyframes spin-ccw{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
-
-/* Orbiting dots */
-.orbit-dot{
-  position:absolute;border-radius:50%;
-  top:50%;left:50%;
-  opacity:0;
-  animation:ring-appear .5s 1s forwards, orbit var(--speed) 1s linear infinite;
-}
-@keyframes orbit{
-  from{transform:rotate(var(--start)) translateX(var(--r)) rotate(calc(-1 * var(--start)))}
-  to{transform:rotate(calc(var(--start) + 360deg)) translateX(var(--r)) rotate(calc(-1 * (var(--start) + 360deg)))}
-}
-
-/* ── TEXT ── */
+/* ── TEXT REVEAL ── */
 .store-name{
   font-family:'Cormorant Garamond',serif;
-  font-size:clamp(2rem,8vw,2.8rem);font-weight:700;
-  color:var(--gold);letter-spacing:.06em;line-height:1;
-  margin-bottom:.3rem;
-  opacity:0;animation:fade-up .6s 4.7s forwards;
+  font-size:clamp(2rem,7vw,2.8rem);
+  font-weight:700;color:var(--gold);
+  letter-spacing:.12em;
+  margin-top:1.2rem;
+  opacity:0;transform:translateY(20px);
+  transition:opacity .8s,transform .8s;
+  text-shadow:0 0 30px rgba(201,151,58,.5);
 }
+.store-name.show{opacity:1;transform:translateY(0)}
 .tagline{
   font-family:'Cormorant Garamond',serif;
-  font-size:clamp(.78rem,2.8vw,.92rem);font-style:italic;
-  color:var(--gold-dim);letter-spacing:.12em;
-  margin-bottom:1.5rem;
-  opacity:0;animation:fade-up .6s 4.9s forwards;
+  font-size:clamp(.72rem,2.5vw,.88rem);
+  font-style:italic;color:rgba(201,151,58,.55);
+  letter-spacing:.18em;margin-top:.3rem;
+  opacity:0;transform:translateY(12px);
+  transition:opacity .8s .3s,transform .8s .3s;
 }
-@keyframes fade-up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.tagline.show{opacity:1;transform:translateY(0)}
 
-.divider{
-  display:flex;align-items:center;gap:.65rem;
-  margin:0 auto 1.6rem;width:min(180px,48vw);
-  opacity:0;animation:fade-up .5s 5.1s forwards;
+/* ── DIVIDER ── */
+.text-divider{
+  display:flex;align-items:center;gap:.6rem;
+  width:min(160px,44vw);margin-top:.9rem;
+  opacity:0;transition:opacity .8s .5s;
 }
-.div-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(201,151,58,.4),transparent)}
-.div-gem{width:6px;height:6px;background:var(--magenta);transform:rotate(45deg);flex-shrink:0;box-shadow:0 0 8px rgba(194,24,91,.6)}
+.text-divider.show{opacity:1}
+.tdl{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(201,151,58,.4),transparent)}
+.tdg{width:5px;height:5px;background:var(--magenta);transform:rotate(45deg);flex-shrink:0;box-shadow:0 0 6px rgba(194,24,91,.6)}
 
-/* Typewriter */
-.type-wrap{min-height:4.5rem;margin-bottom:1.75rem;display:flex;flex-direction:column;align-items:center;gap:.5rem}
+/* ── TYPEWRITER ── */
+.type-wrap{
+  margin-top:1.1rem;
+  min-height:3.2rem;
+  display:flex;flex-direction:column;align-items:center;gap:.35rem;
+  opacity:0;transition:opacity .6s .7s;
+}
+.type-wrap.show{opacity:1}
 .type-line1{
   font-family:'Cormorant Garamond',serif;
-  font-size:clamp(1.7rem,6.5vw,2.3rem);font-weight:700;
-  color:#fff;letter-spacing:.1em;min-height:1.3em;
+  font-size:clamp(1.4rem,5vw,1.9rem);
+  font-weight:700;color:#fff;letter-spacing:.1em;min-height:1.3em;
 }
 .type-line1 .gold{color:var(--gold);font-style:italic}
 .type-line2{
   font-family:'Cormorant Garamond',serif;
-  font-size:clamp(.84rem,3vw,.98rem);
-  color:rgba(201,151,58,.72);letter-spacing:.07em;font-style:italic;min-height:1.4em;
+  font-size:clamp(.75rem,2.5vw,.88rem);
+  color:rgba(201,151,58,.65);letter-spacing:.07em;font-style:italic;min-height:1.3em;
 }
-.cursor{display:inline-block;width:2px;height:1em;background:var(--gold);margin-left:2px;vertical-align:middle;animation:blink .7s step-end infinite}
+.cursor{display:inline-block;width:2px;height:.9em;background:var(--gold);margin-left:2px;vertical-align:middle;animation:blink .7s step-end infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
-/* Enter button */
+/* ── ENTER BUTTON ── */
 .enter-btn{
-  display:inline-flex;align-items:center;gap:.65rem;
+  display:inline-flex;align-items:center;gap:.6rem;
   background:transparent;color:var(--gold);
-  border:1.5px solid rgba(201,151,58,.45);
-  border-radius:40px;padding:.88rem 2.6rem;
-  font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;letter-spacing:.14em;
+  border:1.5px solid rgba(201,151,58,.4);
+  border-radius:40px;padding:.8rem 2.4rem;
+  font-family:'Cormorant Garamond',serif;
+  font-size:1rem;font-weight:600;letter-spacing:.15em;
   cursor:pointer;text-transform:uppercase;
-  opacity:0;transform:translateY(14px);
-  transition:opacity .5s,transform .5s,box-shadow .3s,border-color .3s;
+  margin-top:1rem;
+  opacity:0;transform:translateY(12px);
+  transition:opacity .6s,transform .6s,box-shadow .3s,border-color .3s;
   position:relative;overflow:hidden;
 }
 .enter-btn.visible{opacity:1;transform:translateY(0)}
-.enter-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,151,58,.06),rgba(201,151,58,.16));opacity:0;transition:.3s}
+.enter-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,151,58,.06),rgba(201,151,58,.18));opacity:0;transition:.3s}
 .enter-btn:hover::before,.enter-btn:active::before{opacity:1}
-.enter-btn:hover{border-color:var(--gold);box-shadow:0 0 28px rgba(201,151,58,.25),0 0 55px rgba(201,151,58,.1);transform:translateY(-2px)}
+.enter-btn:hover{border-color:var(--gold);box-shadow:0 0 28px rgba(201,151,58,.3);transform:translateY(-2px)}
 .enter-btn:active{transform:scale(.97)}
-.btn-arrow{width:20px;height:20px;border:1.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.btn-arr{width:18px;height:18px;border:1.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center}
 
-.bottom-orn{margin-top:1.6rem;font-size:.6rem;letter-spacing:.22em;color:rgba(201,151,58,.2);text-transform:uppercase;opacity:0;animation:fade-up .5s 5.2s forwards}
+/* ── FLASH ── */
+.flash{position:fixed;inset:0;background:#fff;z-index:100;opacity:0;pointer-events:none;transition:opacity .15s}
+.flash.go{opacity:.7}
 
-/* Exit */
-.splash.exit{animation:splash-exit .55s forwards}
-@keyframes splash-exit{to{opacity:0;transform:scale(1.03)}}
+/* ── EXIT ── */
+.fade-out{animation:fade-exit .7s forwards}
+@keyframes fade-exit{to{opacity:0}}
 
 @media(max-width:380px){
-  .logo-stage{width:160px;height:160px}
-  .enter-btn{padding:.74rem 1.9rem;font-size:.98rem}
+  .logo-img-wrap{width:145px;height:145px}
+  .enter-btn{padding:.7rem 1.8rem;font-size:.9rem}
+  .bar-top,.bar-bottom{height:12vh}
 }
 </style>
 </head>
 <body>
 
-<div class="bg-glow"></div>
-<div class="particles" id="particles"></div>
+<!-- CINEMATIC BARS -->
+<div class="bar-top" id="bar-top"></div>
+<div class="bar-bottom" id="bar-bottom"></div>
 
-<div class="splash" id="splash">
+<!-- PARTICLE CANVAS -->
+<canvas id="canvas"></canvas>
 
-  <!-- LOGO -->
-  <div class="logo-stage">
-    <!-- Gold ring — always visible around logo -->
+<!-- LIGHT RAYS -->
+<div class="rays" id="rays">
+  <!-- 16 rays spread 360° -->
+</div>
+
+<!-- CENTER GLOW -->
+<div class="center-glow" id="center-glow"></div>
+
+<!-- FLASH -->
+<div class="flash" id="flash"></div>
+
+<!-- MAIN LOGO + TEXT -->
+<div class="logo-wrap" id="logo-wrap">
+  <div class="logo-img-wrap">
     <div class="logo-ring"></div>
-    <!-- Spinning decorative rings -->
-    <div class="ring-spin"></div>
-    <div class="ring-spin2"></div>
-    <!-- Orbiting coloured dots -->
-    <div class="orbit-dot" style="--speed:3.5s;--start:0deg;--r:120px;width:7px;height:7px;background:var(--gold);margin:-3.5px 0 0 -3.5px"></div>
-    <div class="orbit-dot" style="--speed:5s;--start:120deg;--r:120px;width:5px;height:5px;background:var(--magenta);margin:-2.5px 0 0 -2.5px"></div>
-    <div class="orbit-dot" style="--speed:7s;--start:240deg;--r:120px;width:6px;height:6px;background:var(--teal);margin:-3px 0 0 -3px"></div>
-    <!-- The actual logo image -->
-    <img
-      class="logo-img"
-      id="logo-img"
-      src="Desi_Vibe_Logo.png"
-      alt="Desi Vibes"
-      onerror="this.src='';this.style.cssText='position:absolute;inset:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Cormorant Garamond,serif;font-size:3rem;color:#C9973A;opacity:.6'"
-    >
+    <div class="logo-ring2"></div>
+    <img class="logo-img" src="Desi_Vibe_Logo.png" alt="Desi Vibes" onerror="this.style.opacity='.15'">
   </div>
-
-  <!-- STORE NAME -->
-  <div class="store-name">Desi Vibes</div>
-  <div class="tagline">Where Tradition Meets Trend</div>
-
-  <!-- DIVIDER -->
-  <div class="divider">
-    <div class="div-line"></div>
-    <div class="div-gem"></div>
-    <div class="div-line"></div>
+  <div class="store-name" id="store-name">Desi Vibes</div>
+  <div class="tagline" id="tagline">Where Tradition Meets Trend</div>
+  <div class="text-divider" id="text-divider">
+    <div class="tdl"></div><div class="tdg"></div><div class="tdl"></div>
   </div>
-
-  <!-- TYPEWRITER -->
-  <div class="type-wrap">
+  <div class="type-wrap" id="type-wrap">
     <div class="type-line1" id="line1"></div>
     <div class="type-line2" id="line2"></div>
   </div>
-
-  <!-- ENTER BUTTON -->
   <button class="enter-btn" id="enter-btn" onclick="enterSite()">
     Enter
-    <div class="btn-arrow">
-      <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
-        <path d="M2 4.5h5M5 2l2.5 2.5L5 7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <div class="btn-arr">
+      <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+        <path d="M1.5 4h5M4 1.5L6.5 4 4 6.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
   </button>
-
-  <div class="bottom-orn">✦ &nbsp; Authentic Indian Fashion &nbsp; ✦</div>
 </div>
 
 <script>
-// Particles
-const pc = document.getElementById('particles');
-for(let i = 0; i < 28; i++){
-  const p = document.createElement('div');
-  p.className = 'particle';
-  const s = 1 + Math.random() * 2.5;
-  const colors = ['#C9973A','#C2185B','#00897B'];
-  p.style.cssText = `left:${Math.random()*100}%;top:${75+Math.random()*30}%;width:${s}px;height:${s}px;background:${colors[Math.floor(Math.random()*3)]};--dur:${5+Math.random()*9}s;--delay:${Math.random()*7}s`;
-  pc.appendChild(p);
+// ── RAYS SETUP ──
+const raysEl = document.getElementById('rays');
+const RAY_COUNT = 16;
+for(let i = 0; i < RAY_COUNT; i++){
+  const r = document.createElement('div');
+  r.className = 'ray';
+  const angle = (i / RAY_COUNT) * 360;
+  r.style.cssText = `
+    transform:rotate(${angle}deg) translateX(-50%);
+    opacity:${0.3 + Math.random()*0.5};
+    height:${45+Math.random()*20}vh;
+    width:${1+Math.random()*2}px;
+  `;
+  raysEl.appendChild(r);
 }
 
+// ── PARTICLE SYSTEM ──
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let W, H, cx, cy;
+let particles = [];
+let animId;
+let phase = 0; // 0=burst, 1=converge, 2=done
+
+function resize(){
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  cx = W / 2;
+  cy = H / 2;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// Particle class
+class Particle {
+  constructor(targetX, targetY, delay){
+    // Start from random position far from center
+    const angle = Math.random() * Math.PI * 2;
+    const dist  = Math.max(W, H) * (.5 + Math.random() * .6);
+    this.x  = cx + Math.cos(angle) * dist;
+    this.y  = cy + Math.sin(angle) * dist;
+    this.tx = targetX; // converge target
+    this.ty = targetY;
+    this.delay   = delay;
+    this.elapsed = 0;
+    this.size    = 1 + Math.random() * 2.5;
+    this.alpha   = 0;
+    // Gold / magenta / teal palette
+    const palette = [
+      `rgba(201,151,58,`,
+      `rgba(232,184,75,`,
+      `rgba(194,24,91,`,
+      `rgba(0,137,123,`,
+      `rgba(255,220,100,`,
+    ];
+    this.colorBase = palette[Math.floor(Math.random() * palette.length)];
+    this.trail = [];
+    this.speed = .018 + Math.random() * .014; // lerp speed
+    this.done  = false;
+  }
+  update(dt){
+    this.elapsed += dt;
+    if(this.elapsed < this.delay) return;
+    // Fade in
+    this.alpha = Math.min(1, (this.elapsed - this.delay) / 300);
+    // Store trail
+    this.trail.push({x: this.x, y: this.y});
+    if(this.trail.length > 8) this.trail.shift();
+    // Lerp toward target
+    this.x += (this.tx - this.x) * this.speed;
+    this.y += (this.ty - this.y) * this.speed;
+    const d = Math.hypot(this.tx - this.x, this.ty - this.y);
+    if(d < 1.5) this.done = true;
+  }
+  draw(){
+    if(this.alpha <= 0) return;
+    // Draw trail
+    for(let i = 0; i < this.trail.length; i++){
+      const t = this.trail[i];
+      const a = (i / this.trail.length) * this.alpha * 0.4;
+      ctx.beginPath();
+      ctx.arc(t.x, t.y, this.size * .6, 0, Math.PI * 2);
+      ctx.fillStyle = this.colorBase + a + ')';
+      ctx.fill();
+    }
+    // Main dot
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = this.colorBase + this.alpha + ')';
+    ctx.shadowBlur  = 8;
+    ctx.shadowColor = this.colorBase + '0.8)';
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+}
+
+// Generate particle targets in a circular pattern around center
+function makeParticles(){
+  particles = [];
+  const COUNT = 220;
+  for(let i = 0; i < COUNT; i++){
+    // Targets form rings and a filled circle shape
+    const ring  = Math.random() < .6 ? 1 : (Math.random() < .5 ? 2 : 0);
+    const logoR = Math.min(W, H) * .13; // ~logo radius
+    let tx, ty;
+    if(ring === 0){
+      // Fill area
+      const a = Math.random() * Math.PI * 2;
+      const r = Math.random() * logoR * .8;
+      tx = cx + Math.cos(a) * r;
+      ty = cy + Math.sin(a) * r;
+    } else {
+      // Ring
+      const a   = Math.random() * Math.PI * 2;
+      const r   = logoR * (ring === 1 ? 1 : 1.2);
+      const jit = (Math.random() - .5) * 20;
+      tx = cx + Math.cos(a) * (r + jit);
+      ty = cy + Math.sin(a) * (r + jit);
+    }
+    const delay = 200 + Math.random() * 600;
+    particles.push(new Particle(tx, ty, delay));
+  }
+  // Extra sparkle particles in wider area
+  for(let i = 0; i < 60; i++){
+    const a = Math.random() * Math.PI * 2;
+    const r = Math.min(W,H) * (.18 + Math.random() * .15);
+    const tx = cx + Math.cos(a) * r;
+    const ty = cy + Math.sin(a) * r;
+    particles.push(new Particle(tx, ty, Math.random() * 800));
+  }
+}
+
+let lastTime = null;
+let startTime = null;
+
+function animate(ts){
+  if(!lastTime) lastTime = ts;
+  if(!startTime) startTime = ts;
+  const dt = ts - lastTime;
+  lastTime = ts;
+  const elapsed = ts - startTime;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Ambient dark bg gradient
+  const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W,H)*.6);
+  grad.addColorStop(0, 'rgba(30,15,0,.15)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  let allDone = true;
+  for(const p of particles){
+    p.update(dt);
+    p.draw();
+    if(!p.done) allDone = false;
+  }
+
+  // At 2s — show flash + reveal logo
+  if(elapsed > 1800 && phase === 0){
+    phase = 1;
+    triggerReveal();
+  }
+
+  animId = requestAnimationFrame(animate);
+}
+
+function triggerReveal(){
+  // Flash
+  const flash = document.getElementById('flash');
+  flash.classList.add('go');
+  setTimeout(() => flash.classList.remove('go'), 200);
+
+  // Show rays + glow
+  setTimeout(() => {
+    document.getElementById('rays').classList.add('show');
+    document.getElementById('center-glow').classList.add('show');
+  }, 150);
+
+  // Show logo
+  setTimeout(() => {
+    document.getElementById('logo-wrap').classList.add('show');
+  }, 300);
+
+  // Open cinematic bars
+  setTimeout(() => {
+    document.getElementById('bar-top').classList.add('open');
+    document.getElementById('bar-bottom').classList.add('open');
+  }, 400);
+
+  // Show store name
+  setTimeout(() => {
+    document.getElementById('store-name').classList.add('show');
+  }, 900);
+  setTimeout(() => {
+    document.getElementById('tagline').classList.add('show');
+  }, 1100);
+  setTimeout(() => {
+    document.getElementById('text-divider').classList.add('show');
+  }, 1200);
+
+  // Start typewriter
+  setTimeout(() => {
+    document.getElementById('type-wrap').classList.add('show');
+    startTypewriter();
+  }, 1400);
+
+  // Fade out particles gradually
+  setTimeout(() => fadeOutCanvas(), 800);
+}
+
+function fadeOutCanvas(){
+  let a = 1;
+  const fade = setInterval(() => {
+    a -= .025;
+    canvas.style.opacity = Math.max(0, a);
+    if(a <= 0){ clearInterval(fade); cancelAnimationFrame(animId); }
+  }, 40);
+}
+
+// ── TYPEWRITER ──
 let typingDone = false;
-
-// Start typewriter after logo animation finishes (~5.3s)
-setTimeout(startTypewriter, 5300);
-
 function startTypewriter(){
   typeText(document.getElementById('line1'), 'Welcome', 110, () => {
     document.getElementById('line1').innerHTML = '<span class="gold">Welcome</span>';
     setTimeout(() => {
-      typeText(document.getElementById('line2'), 'Click below to Enter our Collection', 52, () => {
+      typeText(document.getElementById('line2'), 'Click below to Enter our Collection', 50, () => {
         setTimeout(() => {
           document.getElementById('enter-btn').classList.add('visible');
           typingDone = true;
         }, 300);
       });
-    }, 650);
+    }, 600);
   });
 }
 
@@ -298,7 +476,7 @@ function typeText(el, text, speed, onDone){
     if(i < text.length){
       el.innerHTML = text.substring(0, i+1) + '<span class="cursor"></span>';
       i++;
-      setTimeout(tick, speed + (Math.random() * 22 - 11));
+      setTimeout(tick, speed + (Math.random() * 20 - 10));
     } else {
       setTimeout(() => { el.innerHTML = text; if(onDone) onDone(); }, 400);
     }
@@ -308,11 +486,15 @@ function typeText(el, text, speed, onDone){
 
 function enterSite(){
   if(!typingDone) return;
-  document.getElementById('splash').classList.add('exit');
-  setTimeout(() => { window.location.href = 'customer_catalog.html'; }, 580);
+  document.body.style.transition = 'opacity .6s';
+  document.body.style.opacity = '0';
+  setTimeout(() => { window.location.href = 'customer_catalog.html'; }, 620);
 }
-
 document.addEventListener('keydown', e => { if(e.key === 'Enter' && typingDone) enterSite(); });
+
+// ── START ──
+makeParticles();
+requestAnimationFrame(animate);
 </script>
 </body>
 </html>
