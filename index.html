@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="theme-color" content="#000000">
 <title>Desi Vibes — Where Tradition Meets Trend</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -69,11 +69,10 @@ body{display:flex;align-items:center;justify-content:center;min-height:100vh;fon
 }
 .logo-wrap.show{opacity:1}
 
-.logo-img-wrap{position:relative;width:min(200px,52vw);height:min(200px,52vw)}
+.logo-img-wrap{position:relative;width:min(320px,80vw);height:auto;min-height:160px}
 .logo-img{
-  width:100%;height:100%;object-fit:contain;
+  width:100%;height:auto;object-fit:contain;
   display:block;
-  mix-blend-mode:screen;
   animation:logo-breathe 3s ease-in-out infinite;
 }
 @keyframes logo-breathe{
@@ -84,13 +83,13 @@ body{display:flex;align-items:center;justify-content:center;min-height:100vh;fon
 /* Gold ring */
 .logo-ring{
   position:absolute;
-  inset:-8px;border-radius:50%;
+  inset:-8px;border-radius:40%;
   border:1.5px solid rgba(201,151,58,.6);
   box-shadow:0 0 16px rgba(201,151,58,.4),inset 0 0 16px rgba(201,151,58,.1);
   animation:ring-spin 8s linear infinite;
 }
 .logo-ring2{
-  position:absolute;inset:-16px;border-radius:50%;
+  position:absolute;inset:-16px;border-radius:40%;
   border:1px dashed rgba(201,151,58,.3);
   animation:ring-spin 14s linear infinite reverse;
 }
