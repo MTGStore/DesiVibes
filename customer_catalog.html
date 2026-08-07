@@ -324,7 +324,7 @@ function renderGrid(){
     <div class="card" onclick="openMod('${p.id}')">
       <div class="card-img">
         ${p.img?`<img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=card-img-ph>👗</div>'">`:`<div class="card-img-ph">👗</div>`}
-        ${oos(p)?`<div class="oos-ov"></div><div class="oos-tag">Out of Stock</div>`:`<button class="atc-btn" onclick="event.stopPropagation();addToCart('${p.id}')">+ Add to Cart</button>`}
+        ${oos(p)?`<div class="oos-ov"></div><div class="oos-tag">${p.status==='Pending'?'Reserved':'Out of Stock'}</div>`:`<button class="atc-btn" onclick="event.stopPropagation();addToCart('${p.id}')">+ Add to Cart</button>`}
       </div>
       <div class="card-body">
         <div class="card-price">$${p.retail.toFixed(2)}</div>
@@ -401,7 +401,7 @@ function sendCartWA(){
   const note=document.getElementById('cart-note').value.trim();
   const total=cart.reduce((a,p)=>a+p.retail,0);
   let msg=`🛍️ *Order Request — Desi Vibes*\n_Where Tradition Meets Trend_\n\n`;
-  cart.forEach((p,i)=>{msg+=`${i+1}. *${p.name}*\n   Item # ${p.id} · $${p.retail.toFixed(2)}\n`;});
+  cart.forEach((p,i)=>{msg+=`${i+1}. *${p.name}*\n   Item # ${p.id} · $${p.retail.toFixed(2)}${p.img?'\n   📸 '+p.img:''}\n`;});
   msg+=`\n💰 *Total: $${total.toFixed(2)}*`;
   if(note)msg+=`\n\n💬 *Note:* ${note}`;
   msg+=`\n\nPlease confirm. Thank you! 🙏`;
