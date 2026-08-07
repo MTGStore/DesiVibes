@@ -258,22 +258,25 @@ tr:hover td{background:rgba(201,151,58,.03)}
             <div class="fg"><label>Retail Price ($) *</label><input type="number" id="f-retail" placeholder="0.00" step="0.01" oninput="calcMargin()"></div>
             <div class="fg"><label>Qty</label><input type="number" id="f-qty" value="1" min="1"></div>
             <div class="fg" style="grid-column:1/-1">
-              <label>Product Photo</label>
-              <div class="img-zone" id="img-zone-wrap">
+              <label>Product Photos <span style="color:var(--muted);font-weight:400;font-size:.72rem">(up to 5 — first photo is the main one)</span></label>
+
+              <!-- Photo slots grid -->
+              <div id="photo-slots" style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:.6rem"></div>
+
+              <!-- Add photo button -->
+              <div class="img-zone" id="img-zone-wrap" style="margin-bottom:.4rem">
                 <input type="file" id="f-img-file" accept="image/*" onchange="handleImgUpload(event)">
                 <span class="img-zone-icon" id="img-zone-icon">📷</span>
-                <div class="img-zone-txt" id="img-zone-txt">Tap to upload photo</div>
-                <div class="img-zone-sub">JPG · PNG · WEBP · Max 5MB · Uploads automatically</div>
+                <div class="img-zone-txt" id="img-zone-txt">Tap to add photo</div>
+                <div class="img-zone-sub">JPG · PNG · WEBP · Max 5MB · Auto-uploads to cloud</div>
               </div>
-              <div id="img-upload-status" style="display:none;margin-top:.4rem;font-size:.75rem;padding:.4rem .65rem;border-radius:4px;font-weight:600"></div>
-              <div id="preview-wrap" style="display:none;margin-top:.6rem">
-                <div style="position:relative;display:inline-block">
-                  <img id="img-preview" class="img-preview" src="" alt="Preview" style="display:block">
-                  <button class="img-remove" id="img-remove-btn" onclick="removeImg()" style="display:block">✕</button>
-                </div>
+              <div id="img-upload-status" style="display:none;margin-top:.3rem;font-size:.73rem;padding:.38rem .6rem;border-radius:4px;font-weight:600"></div>
+
+              <div style="font-size:.68rem;color:var(--muted);margin-top:.5rem">— or paste image URL directly:</div>
+              <div style="display:flex;gap:.4rem;margin-top:.28rem">
+                <input type="text" id="f-img-url" placeholder="https://..." style="flex:1" oninput="handleUrlInput()">
+                <button class="btn btn-outline" onclick="addPhotoFromUrl()" style="font-size:.72rem;padding:.35rem .65rem;flex-shrink:0">Add</button>
               </div>
-              <div style="font-size:.68rem;color:var(--muted);margin-top:.4rem">— or paste GitHub image URL:</div>
-              <input type="text" id="f-img-url" placeholder="https://MTGStore.github.io/clothing-catalog/images/12345.jpg" style="margin-top:.28rem" oninput="handleUrlInput()">
             </div>
             <div class="fg" style="grid-column:1/-1">
               <label>Description (shown to customers)</label>
@@ -405,10 +408,21 @@ function doLogin(){
 }
 function doLogout(){ sessionStorage.removeItem('auth'); location.reload(); }
 window.addEventListener('load',()=>{
-  // Load saved ImgBB key
+  // Load ImgBB key — from localStorage first, then from Google Sheet Config
   const savedKey=localStorage.getItem('imgbb_key');
   if(savedKey){const kf=document.getElementById('imgbb-key');if(kf)kf.value=savedKey;}
-  // Auto-load from sheet on login
+  // Fetch key from Google Sheet Config tab
+  if(API_URL){
+    fetch(API_URL+'?action=getConfig&t='+Date.now(),{redirect:'follow'})
+      .then(r=>r.json()).then(d=>{
+        if(d.success && d.imgbb_key){
+          localStorage.setItem('imgbb_key', d.imgbb_key);
+          const kf=document.getElementById('imgbb-key');
+          if(kf) kf.value=d.imgbb_key;
+        }
+      }).catch(()=>{});
+  }
+  // Auto-load products from sheet
   setTimeout(()=>{ if(API_URL) loadFromSheetAPI(); }, 1500);
   if(sessionStorage.getItem('auth')==='1'){ document.getElementById('login-screen').style.display='none'; document.getElementById('app').style.display='block'; renderAll(); }
   document.getElementById('pwd-input').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
@@ -417,6 +431,39 @@ window.addEventListener('load',()=>{
 let products=JSON.parse(localStorage.getItem('clothing_products')||'[]');
 let sales=JSON.parse(localStorage.getItem('clothing_sales')||'[]');
 let curImg='';
+let curPhotos=[]; // array of URLs for multi-photo
+
+function renderPhotoSlots(){
+  const wrap=document.getElementById('photo-slots');
+  if(!wrap) return;
+  if(curPhotos.length===0){wrap.innerHTML='';return;}
+  wrap.innerHTML=curPhotos.map((url,i)=>`
+    <div style="position:relative;aspect-ratio:3/4;background:var(--card2);border-radius:4px;overflow:hidden;border:1px solid ${i===0?'var(--gold)':'var(--border)'}">
+      <img src="${url}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">
+      ${i===0?'<div style="position:absolute;top:4px;left:4px;background:var(--gold);color:#000;font-size:.58rem;font-weight:700;padding:1px 5px;border-radius:2px">MAIN</div>':''}
+      <button onclick="removePhoto(${i})" style="position:absolute;top:3px;right:3px;background:rgba(0,0,0,.7);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:.7rem;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>`).join('');
+  // Update curImg to first photo
+  curImg=curPhotos[0]||'';
+  // Hide add zone if 5 photos reached
+  const zone=document.getElementById('img-zone-wrap');
+  if(zone) zone.style.display=curPhotos.length>=5?'none':'block';
+}
+
+function removePhoto(idx){
+  curPhotos.splice(idx,1);
+  curImg=curPhotos[0]||'';
+  renderPhotoSlots();
+}
+
+function addPhotoFromUrl(){
+  const u=(document.getElementById('f-img-url')||{value:''}).value.trim();
+  if(!u){return;}
+  if(curPhotos.length>=5){alert('Max 5 photos per item.');return;}
+  curPhotos.push(u);
+  document.getElementById('f-img-url').value='';
+  renderPhotoSlots();
+}
 
 async function handleImgUpload(e){
   const f=e.target.files[0]; if(!f) return;
@@ -435,10 +482,11 @@ async function handleImgUpload(e){
       const data=await res.json();
       if(data.success){
         curImg=data.data.url;
-        document.getElementById('f-img-url').value=curImg;
-        showPreview(curImg);
-        if(icon)icon.textContent='✅';if(txt)txt.textContent='Uploaded!';
-        if(status){status.style.cssText='display:block;background:rgba(46,125,50,.12);color:#66bb6a;border:1px solid rgba(46,125,50,.3);padding:.35rem .6rem;border-radius:4px;font-size:.72rem;margin-top:.4rem';status.textContent='✅ Photo uploaded — URL saved to Google Sheet';}
+        if(curPhotos.length<5) curPhotos.push(curImg);
+        document.getElementById('f-img-url').value='';
+        renderPhotoSlots();
+        if(icon)icon.textContent='✅';if(txt)txt.textContent='Tap to add another photo';
+        if(status){status.style.cssText='display:block;background:rgba(46,125,50,.12);color:#66bb6a;border:1px solid rgba(46,125,50,.3);padding:.35rem .6rem;border-radius:4px;font-size:.72rem;margin-top:.4rem';status.textContent='✅ Photo '+(curPhotos.length)+' uploaded successfully';}
         return;
       } else throw new Error('fail');
     } catch(err){
@@ -448,16 +496,18 @@ async function handleImgUpload(e){
   // Fallback to base64 (local only)
   const rd=new FileReader();
   rd.onload=ev=>{
-    curImg=ev.target.result; showPreview(curImg);
-    if(icon)icon.textContent='📷';if(txt)txt.textContent='Saved locally';
+    curImg=ev.target.result;
+    if(curPhotos.length<5) curPhotos.push(curImg);
+    renderPhotoSlots();
+    if(icon)icon.textContent='📷';if(txt)txt.textContent='Tap to add another photo';
     if(status){status.style.cssText='display:block;background:rgba(251,140,0,.1);color:#fb8c00;border:1px solid rgba(251,140,0,.3);padding:.35rem .6rem;border-radius:4px;font-size:.72rem;margin-top:.4rem';
     status.textContent=IMGBB_KEY?'⚠️ Upload failed — photo saved locally only':'⚠️ No ImgBB key — photo local only. Will NOT appear on website after sync.';}
   };
   rd.readAsDataURL(f);
 }
-function handleUrlInput(){ const u=document.getElementById('f-img-url').value.trim(); if(u){curImg=u;showPreview(u);}else removeImg(); }
-function showPreview(src){ document.getElementById('img-preview').src=src; document.getElementById('img-preview').style.display='block'; document.getElementById('img-remove-btn').style.display='block'; document.getElementById('preview-wrap').style.display='block'; }
-function removeImg(){ curImg=''; document.getElementById('img-preview').src=''; document.getElementById('img-preview').style.display='none'; document.getElementById('img-remove-btn').style.display='none'; document.getElementById('preview-wrap').style.display='none'; document.getElementById('f-img-file').value=''; document.getElementById('f-img-url').value=''; }
+function handleUrlInput(){ /* handled by addPhotoFromUrl on button click */ }
+function showPreview(src){ /* replaced by renderPhotoSlots */ }
+function removeImg(){ curPhotos=[]; curImg=''; renderPhotoSlots(); }
 
 function switchTab(n,el){ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active')); el.classList.add('active'); document.getElementById('pane-'+n).classList.add('active'); if(n==='inventory') renderInventory(); if(n==='sales') renderSales(); if(n==='share') buildWASelect(); }
 
@@ -487,7 +537,7 @@ function addProduct(){
   saveToSheet(newP);
   renderAll(); clearForm(); alert('✅ "'+name+'" added to Desi Vibes!');
 }
-function clearForm(){ ['f-id','f-name','f-cost','f-retail','f-notes','f-img-url'].forEach(id=>document.getElementById(id).value=''); document.getElementById('f-qty').value='1'; removeImg(); calcMargin(); }
+function clearForm(){ ['f-id','f-name','f-batch','f-cost','f-retail','f-notes','f-img-url'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; }); const qel=document.getElementById('f-qty'); if(qel) qel.value='1'; curPhotos=[]; curImg=''; renderPhotoSlots(); const iz=document.getElementById('img-zone-icon'); const it=document.getElementById('img-zone-txt'); if(iz) iz.textContent='📷'; if(it) it.textContent='Tap to add photo'; calcMargin(); }
 
 function markSold(id){
   const p=products.find(x=>x.id===id); if(!p) return;
@@ -541,6 +591,7 @@ function renderInventory(){
         ${isActive?`<button class="act-btn act-sell" onclick="markSold('${p.id}')">Sold</button>`:''}
         ${isActive?`<button class="act-btn" style="background:rgba(251,140,0,.12);color:#fb8c00;border-color:#fb8c00;font-size:.7rem" onclick="markPending('${p.id}')">Pending</button>`:''}
         ${(isSold||isPending)?`<button class="act-btn act-relist" onclick="relistItem('${p.id}')">Relist</button>`:''}
+<button class="act-btn" style="background:rgba(0,137,123,.12);color:var(--teal);border-color:var(--teal);font-size:.7rem" onclick="editPhotos('${p.id}')">📷 Photos</button>
         <button class="act-btn" style="background:rgba(21,101,192,.12);color:#64b5f6;border-color:#1565c0" onclick="deleteProduct('${p.id}')">Del</button>
       </td></tr>`;  }).join('');
 }
@@ -633,12 +684,10 @@ function sheetGet(action){
 // Save a single product to Google Sheet
 function saveToSheet(product){
   if(!API_URL) return;
-  // Strip base64 images before sending to sheet — they're too large
-  // Only send real URLs (http/https)
+  // Strip base64 — only send real URLs to sheet
   const p={...product};
-  if(p.img && p.img.startsWith('data:')){
-    p.img=''; // base64 can't go to sheet — use ImgBB for real URLs
-  }
+  if(p.img && p.img.startsWith('data:')) p.img='';
+  if(p.photos) p.photos=p.photos.filter(u=>u&&!u.startsWith('data:'));
   sheetPost({action:'write', product:p}).catch(()=>{});
 }
 
@@ -784,6 +833,41 @@ function exportBatchCSV(){
   a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
   a.download=(batch||'All_Batches')+'_Report.csv';
   a.click();
+}
+
+
+// ── EDIT PHOTOS for existing item ──
+function editPhotos(id){
+  const p=products.find(x=>x.id===id); if(!p) return;
+  // Go to Add tab and pre-populate with this item's data for photo editing
+  switchTab('add', document.querySelector('.tab'));
+  setTimeout(()=>{
+    // Fill item ID and name so user knows which item
+    const fi=document.getElementById('f-id'); if(fi){fi.value=p.id;fi.readOnly=true;fi.style.opacity='.6';}
+    const fn=document.getElementById('f-name'); if(fn) fn.value=p.name;
+    const fb=document.getElementById('f-batch'); if(fb) fb.value=p.batch||'';
+    // Load existing photos
+    curPhotos=p.photos&&p.photos.length>0?[...p.photos]:(p.img?[p.img]:[]);
+    curImg=curPhotos[0]||'';
+    renderPhotoSlots();
+    // Change save button to update
+    const saveBtn=document.querySelector('.btn-row .btn-gold');
+    if(saveBtn){
+      saveBtn.textContent='Update Photos';
+      saveBtn.onclick=()=>{
+        p.photos=curPhotos.filter(u=>u&&!u.startsWith('data:'));
+        p.img=p.photos[0]||'';
+        save(); saveToSheet(p);
+        alert('✅ Photos updated for '+p.name);
+        // Reset
+        saveBtn.textContent='Save Item';
+        saveBtn.onclick=addProduct;
+        const fi2=document.getElementById('f-id'); if(fi2){fi2.readOnly=false;fi2.style.opacity='';}
+        clearForm();
+        switchTab('inventory', document.querySelectorAll('.tab')[2]);
+      };
+    }
+  }, 100);
 }
 
 </script>
