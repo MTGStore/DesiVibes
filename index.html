@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="theme-color" content="#000000">
 <title>Desi Vibes — Where Tradition Meets Trend</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -212,8 +212,8 @@ body{display:flex;align-items:center;justify-content:center;min-height:100vh;fon
     <div class="logo-ring2"></div>
     <img class="logo-img" src="Desi_Vibe_Logo.png" alt="Desi Vibes" onerror="this.style.opacity='.15'">
   </div>
-  <div class="store-name" id="store-name">Desi Vibes</div>
-  <div class="tagline" id="tagline">Where Tradition Meets Trend</div>
+  <img id="store-name" src="Desi_vibes_word_only.png" alt="Desi Vibes" style="width:min(340px,78vw);height:auto;object-fit:contain;display:block;margin:.5rem auto;opacity:0;transition:opacity .8s,transform .8s;transform:translateY(20px)">
+  <div class="tagline" id="tagline" style="display:none">Where Tradition Meets Trend</div>
   <div class="text-divider" id="text-divider">
     <div class="tdl"></div><div class="tdg"></div><div class="tdl"></div>
   </div>
@@ -424,7 +424,7 @@ function triggerReveal(){
 
   // Show store name
   setTimeout(() => {
-    document.getElementById('store-name').classList.add('show');
+    const sn=document.getElementById('store-name');sn.style.opacity='1';sn.style.transform='translateY(0)';
   }, 900);
   setTimeout(() => {
     document.getElementById('tagline').classList.add('show');
