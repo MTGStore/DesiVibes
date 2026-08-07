@@ -451,6 +451,22 @@ const mb=document.getElementById('modal-box');
 mb.addEventListener('touchstart',e=>{ty=e.touches[0].clientY;},{passive:true});
 mb.addEventListener('touchmove',e=>{if(e.touches[0].clientY-ty>70){document.getElementById('modal').classList.remove('open');document.body.style.overflow='';}},{passive:true});
 
+
+// Photo gallery functions
+function galShow(idx){
+  const photos=window._galPhotos||[];
+  if(!photos[idx]) return;
+  window._galIdx=idx;
+  const img=document.getElementById('m-gal-img');
+  if(img) img.src=photos[idx];
+  photos.forEach((_,i)=>{
+    const d=document.getElementById('gd-'+i);
+    if(d) d.style.background=i===idx?'var(--gold)':'rgba(255,255,255,.4)';
+  });
+}
+function galNext(){ const p=window._galPhotos||[]; galShow((window._galIdx+1)%p.length); }
+function galPrev(){ const p=window._galPhotos||[]; galShow((window._galIdx-1+p.length)%p.length); }
+
 loadData();
 </script>
 </body>
