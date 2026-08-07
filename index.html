@@ -15,113 +15,126 @@
 html,body{width:100%;height:100%;overflow:hidden;background:#000}
 body{font-family:'Inter',sans-serif}
 
-/* ── CANVAS ── */
+/* CANVAS — fireworks + particles */
 #canvas{position:fixed;inset:0;z-index:1}
 
-/* ── CINEMATIC BARS ── */
-.bar{position:fixed;left:0;right:0;background:#000;z-index:50;transition:height 1.2s 0.5s cubic-bezier(.76,0,.24,1)}
+/* CINEMATIC BARS */
+.bar{position:fixed;left:0;right:0;background:#000;z-index:50;
+  transition:height 1.4s 0.3s cubic-bezier(.76,0,.24,1)}
 #bar-top{top:0;height:20vh}
 #bar-bottom{bottom:0;height:20vh}
-#bar-top.open{height:0}
-#bar-bottom.open{height:0}
+#bar-top.open,#bar-bottom.open{height:0}
 
-/* ── RAYS ── */
-#rays{position:fixed;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .8s}
-#rays.show{opacity:1}
-.ray{position:absolute;width:1px;top:50%;left:50%;transform-origin:top center;background:linear-gradient(to bottom,transparent,rgba(201,151,58,.2),transparent);border-radius:2px}
+/* FLASH */
+#flash{position:fixed;inset:0;background:#fff;opacity:0;z-index:200;
+  pointer-events:none;transition:opacity .1s}
+#flash.go{opacity:.9}
 
-/* ── GLOW ── */
-#glow{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(201,151,58,.3) 0%,transparent 70%);z-index:2;opacity:0;transition:opacity .8s;pointer-events:none}
-#glow.show{opacity:1}
-
-/* ── FLASH ── */
-#flash{position:fixed;inset:0;background:#fff;opacity:0;z-index:100;pointer-events:none;transition:opacity .12s}
-#flash.go{opacity:.8}
-
-/* ═══════════════════════════════════════
-   PHASE 1 — LOGO centered on screen
-   Shows during particle animation
-═══════════════════════════════════════ */
+/* PHASE 1 — 3D logo reveal, centered fixed */
 #phase1{
-  position:fixed;inset:0;
-  display:flex;align-items:center;justify-content:center;
-  z-index:10;
-  opacity:0;transition:opacity .8s;
-  pointer-events:none;
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  z-index:10;opacity:0;pointer-events:none;
+  transition:opacity 1s;
 }
 #phase1.show{opacity:1}
-#phase1.hide{opacity:0}
+#phase1.hide{opacity:0;transition:opacity .8s}
 
-.p1-logo-wrap{position:relative;width:min(240px,60vw);height:min(240px,60vw);flex-shrink:0}
-.p1-logo-img{width:100%;height:100%;object-fit:contain;display:block;
-  filter:drop-shadow(0 0 24px rgba(201,151,58,.6)) drop-shadow(0 0 60px rgba(201,151,58,.25));
-  animation:logo-pulse 3s ease-in-out infinite}
-@keyframes logo-pulse{
-  0%,100%{filter:drop-shadow(0 0 18px rgba(201,151,58,.5)) drop-shadow(0 0 45px rgba(201,151,58,.2))}
-  50%{filter:drop-shadow(0 0 35px rgba(201,151,58,.9)) drop-shadow(0 0 90px rgba(201,151,58,.4))}
-}
-/* Rings on phase1 logo */
-.p1-ring{position:absolute;border-radius:50%;animation:spin-cw var(--spd) linear infinite}
-.p1-ring2{position:absolute;border-radius:50%;animation:spin-ccw var(--spd) linear infinite}
-@keyframes spin-cw{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-@keyframes spin-ccw{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
-/* orbit dots */
-.orb{position:absolute;border-radius:50%;top:50%;left:50%;animation:orb-spin var(--spd) linear infinite}
-@keyframes orb-spin{
-  from{transform:rotate(var(--s)) translateX(var(--r)) rotate(calc(-1*var(--s)))}
-  to{transform:rotate(calc(var(--s) + 360deg)) translateX(var(--r)) rotate(calc(-1*(var(--s) + 360deg)))}
+.p1-scene{
+  position:relative;
+  width:min(280px,68vw);height:min(280px,68vw);
+  transform-style:preserve-3d;
+  perspective:600px;
 }
 
-/* ═══════════════════════════════════════
-   PHASE 2 — Full scroll layout
-   Shows after Enter is ready
-═══════════════════════════════════════ */
+/* 3D rotation on logo image */
+.p1-logo{
+  width:100%;height:100%;
+  object-fit:contain;display:block;
+  position:relative;z-index:2;
+  /* starts face-down (rotateY 90deg), rotates to 0 */
+  transform:rotateY(90deg) scale(.6);
+  opacity:0;
+  transition:
+    transform 1.2s cubic-bezier(.34,1.4,.64,1),
+    opacity .6s ease;
+}
+.p1-logo.reveal{
+  transform:rotateY(0deg) scale(1);
+  opacity:1;
+}
+/* after settle, pulse glow */
+.p1-logo.pulse{
+  animation:logo3d-pulse 2.5s ease-in-out infinite;
+}
+@keyframes logo3d-pulse{
+  0%,100%{filter:drop-shadow(0 0 20px rgba(201,151,58,.5)) drop-shadow(0 2px 8px rgba(0,0,0,.8))}
+  50%{filter:drop-shadow(0 0 50px rgba(201,151,58,1)) drop-shadow(0 0 100px rgba(201,151,58,.5)) drop-shadow(0 2px 8px rgba(0,0,0,.8))}
+}
+
+/* Spinning rings around p1 logo */
+.p1-ring{position:absolute;border-radius:50%;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  opacity:0;transition:opacity .6s;
+}
+.p1-ring.show{opacity:1}
+
+/* PHASE 2 — welcome screen */
 #phase2{
-  position:fixed;inset:0;
-  overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
-  z-index:20;
-  opacity:0;transition:opacity .8s;
-  pointer-events:none;
+  position:fixed;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  z-index:20;opacity:0;pointer-events:none;
   display:flex;align-items:center;justify-content:center;
+  transition:opacity .8s;
 }
 #phase2.show{opacity:1;pointer-events:auto}
 
 .p2-inner{
-  width:100%;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  padding:2rem 1.5rem;
-  text-align:center;
-  gap:.85rem;
+  width:100%;min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:2.5rem 1.5rem;text-align:center;gap:.9rem;
 }
 
-/* Phase2 logo — smaller, top */
-.p2-logo-wrap{position:relative;width:min(160px,42vw);height:min(160px,42vw);flex-shrink:0}
-.p2-logo-img{width:100%;height:100%;object-fit:contain;display:block;
-  animation:logo-pulse 3s ease-in-out infinite}
-.p2-ring{position:absolute;border-radius:50%}
-.p2-ring1{inset:-8px;border:2px solid var(--gold);box-shadow:0 0 12px rgba(201,151,58,.5);animation:spin-cw 6s linear infinite}
-.p2-ring2{inset:-15px;border:1px dashed rgba(201,151,58,.4);border-top-color:var(--gold);animation:spin-ccw 10s linear infinite}
-.p2-ring3{inset:-22px;border:1px solid rgba(201,151,58,.15);border-right-color:rgba(201,151,58,.5);animation:spin-cw 16s linear infinite}
+/* Small logo with rings in phase2 */
+.p2-logo-wrap{position:relative;width:min(150px,40vw);height:min(150px,40vw)}
+.p2-logo{width:100%;height:100%;object-fit:contain;display:block;
+  animation:logo3d-pulse 3s ease-in-out infinite}
+.p2-ring{position:absolute;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%)}
+.p2-r1{width:calc(100% + 20px);height:calc(100% + 20px);
+  border:2px solid var(--gold);box-shadow:0 0 14px rgba(201,151,58,.5);
+  animation:spin-cw 6s linear infinite}
+.p2-r2{width:calc(100% + 36px);height:calc(100% + 36px);
+  border:1px dashed rgba(201,151,58,.4);border-top-color:var(--gold);
+  animation:spin-ccw 10s linear infinite}
+.p2-r3{width:calc(100% + 52px);height:calc(100% + 52px);
+  border:1px solid rgba(201,151,58,.15);border-right-color:rgba(201,151,58,.6);
+  animation:spin-cw 16s linear infinite}
+/* orbit dots p2 */
+.p2-orb{position:absolute;border-radius:50%;top:50%;left:50%;
+  animation:orb-s var(--spd) linear infinite}
+@keyframes spin-cw{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes spin-ccw{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(-360deg)}}
+@keyframes orb-s{
+  from{transform:rotate(var(--s)) translateX(var(--r)) rotate(calc(-1*var(--s)))}
+  to{transform:rotate(calc(var(--s) + 360deg)) translateX(var(--r)) rotate(calc(-1*(var(--s)+360deg)))}
+}
 
 /* Wordmark */
-.p2-wordmark{width:min(300px,75vw);height:auto;object-fit:contain;display:block;margin:0 auto}
+.p2-wordmark{width:min(280px,70vw);height:auto;object-fit:contain;display:block;margin:0 auto}
 
 /* Divider */
-.p2-div{display:flex;align-items:center;gap:.6rem;width:min(160px,44vw);margin:0 auto}
+.p2-div{display:flex;align-items:center;gap:.6rem;width:min(150px,42vw)}
 .p2-dl{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-border),transparent)}
-.p2-dg{width:5px;height:5px;background:var(--magenta);transform:rotate(45deg);flex-shrink:0;box-shadow:0 0 6px rgba(194,24,91,.6)}
+.p2-dg{width:5px;height:5px;background:var(--magenta);transform:rotate(45deg);
+  flex-shrink:0;box-shadow:0 0 6px rgba(194,24,91,.6)}
 
 /* Typewriter */
 .p2-type{display:flex;flex-direction:column;align-items:center;gap:.4rem;min-height:3.5rem}
-.p2-l1{font-family:'Cormorant Garamond',serif;font-size:clamp(1.5rem,5.5vw,2rem);font-weight:700;color:#fff;letter-spacing:.1em;min-height:1.3em}
+.p2-l1{font-family:'Cormorant Garamond',serif;font-size:clamp(1.5rem,5.5vw,2rem);
+  font-weight:700;color:#fff;letter-spacing:.1em;min-height:1.3em}
 .p2-l1 .gold{color:var(--gold);font-style:italic}
-.p2-l2{font-family:'Cormorant Garamond',serif;font-size:clamp(.8rem,2.8vw,.95rem);color:rgba(201,151,58,.65);letter-spacing:.07em;font-style:italic;min-height:1.3em}
-.cursor{display:inline-block;width:2px;height:.9em;background:var(--gold);margin-left:2px;vertical-align:middle;animation:blink .7s step-end infinite}
+.p2-l2{font-family:'Cormorant Garamond',serif;font-size:clamp(.8rem,2.8vw,.95rem);
+  color:rgba(201,151,58,.65);letter-spacing:.07em;font-style:italic;min-height:1.3em}
+.cursor{display:inline-block;width:2px;height:.9em;background:var(--gold);
+  margin-left:2px;vertical-align:middle;animation:blink .7s step-end infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
 /* Enter button */
@@ -137,19 +150,23 @@ body{font-family:'Inter',sans-serif}
   position:relative;overflow:hidden;
 }
 .p2-enter.show{opacity:1;transform:translateY(0)}
-.p2-enter::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,151,58,.05),rgba(201,151,58,.15));opacity:0;transition:.3s}
+.p2-enter::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(201,151,58,.05),rgba(201,151,58,.15));
+  opacity:0;transition:.3s}
 .p2-enter:hover::before,.p2-enter:active::before{opacity:1}
 .p2-enter:hover{border-color:var(--gold);box-shadow:0 0 28px rgba(201,151,58,.3);transform:translateY(-2px)}
 .p2-enter:active{transform:scale(.97)}
-.ea{width:18px;height:18px;border:1.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center}
+.ea{width:18px;height:18px;border:1.5px solid var(--gold);border-radius:50%;
+  display:flex;align-items:center;justify-content:center}
 
 .p2-orn{font-size:.58rem;letter-spacing:.22em;color:rgba(201,151,58,.2);text-transform:uppercase}
 
-/* Exit */
+/* EXIT */
 body.exit{animation:body-exit .6s forwards}
 @keyframes body-exit{to{opacity:0}}
 
-@media(max-width:380px){
+@media(max-width:400px){
+  .p1-scene{width:min(220px,80vw);height:min(220px,80vw)}
   .p2-logo-wrap{width:120px;height:120px}
   .p2-enter{padding:.72rem 1.8rem}
 }
@@ -160,48 +177,55 @@ body.exit{animation:body-exit .6s forwards}
 <canvas id="canvas"></canvas>
 <div class="bar" id="bar-top"></div>
 <div class="bar" id="bar-bottom"></div>
-<div id="rays"></div>
-<div id="glow"></div>
 <div id="flash"></div>
 
-<!-- PHASE 1: Big logo centered while particles play -->
+<!-- PHASE 1: Fireworks + 3D logo reveal -->
 <div id="phase1">
-  <div class="p1-logo-wrap">
-    <div class="p1-ring" style="--spd:7s;inset:-10px;border:1.5px solid rgba(201,151,58,.6);box-shadow:0 0 14px rgba(201,151,58,.4)"></div>
-    <div class="p1-ring2" style="--spd:12s;inset:-18px;border:1px dashed rgba(201,151,58,.3);border-top-color:rgba(201,151,58,.7)"></div>
-    <div class="p1-ring" style="--spd:20s;inset:-26px;border:1px solid rgba(201,151,58,.12);border-bottom-color:rgba(201,151,58,.45)"></div>
-    <div class="orb" style="--spd:3.5s;--s:0deg;--r:108px;width:7px;height:7px;background:var(--gold);margin:-3.5px 0 0 -3.5px"></div>
-    <div class="orb" style="--spd:5s;--s:120deg;--r:108px;width:5px;height:5px;background:var(--magenta);box-shadow:0 0 6px rgba(194,24,91,.7);margin:-2.5px 0 0 -2.5px"></div>
-    <div class="orb" style="--spd:7s;--s:240deg;--r:108px;width:6px;height:6px;background:var(--teal);margin:-3px 0 0 -3px"></div>
-    <img class="p1-logo-img" src="Desi_Vibe_Logo.png" alt="Desi Vibes" onerror="this.style.opacity='.1'">
+  <div class="p1-scene" id="p1-scene">
+    <!-- Rings (shown after logo reveals) -->
+    <div class="p1-ring" id="pr1"
+      style="width:calc(100% + 24px);height:calc(100% + 24px);
+      border:2px solid var(--gold);box-shadow:0 0 20px rgba(201,151,58,.6),inset 0 0 20px rgba(201,151,58,.1)">
+    </div>
+    <div class="p1-ring" id="pr2"
+      style="width:calc(100% + 40px);height:calc(100% + 40px);
+      border:1px dashed rgba(201,151,58,.5);border-top-color:var(--gold);
+      animation:spin-cw 8s linear infinite">
+    </div>
+    <div class="p1-ring" id="pr3"
+      style="width:calc(100% + 58px);height:calc(100% + 58px);
+      border:1px solid rgba(201,151,58,.2);border-right-color:rgba(201,151,58,.7);
+      animation:spin-ccw 14s linear infinite">
+    </div>
+    <!-- The logo — 3D flip reveal -->
+    <img class="p1-logo" id="p1-logo"
+      src="Desi_Vibe_Logo-1.png"
+      alt="Desi Vibes"
+      onerror="this.src='Desi_Vibe_Logo.png';this.onerror=null">
   </div>
 </div>
 
-<!-- PHASE 2: Scroll layout with small logo + wordmark + text + enter -->
+<!-- PHASE 2: Welcome screen -->
 <div id="phase2">
   <div class="p2-inner">
-
-    <!-- Small logo with spinning rings -->
     <div class="p2-logo-wrap">
-      <div class="p2-ring p2-ring1"></div>
-      <div class="p2-ring p2-ring2"></div>
-      <div class="p2-ring p2-ring3"></div>
-      <img class="p2-logo-img" src="Desi_Vibe_Logo.png" alt="Desi Vibes" onerror="this.style.opacity='.1'">
+      <div class="p2-ring p2-r1"></div>
+      <div class="p2-ring p2-r2"></div>
+      <div class="p2-ring p2-r3"></div>
+      <div class="p2-orb" style="--spd:3.5s;--s:0deg;--r:90px;width:7px;height:7px;background:var(--gold);margin:-3.5px 0 0 -3.5px"></div>
+      <div class="p2-orb" style="--spd:5s;--s:120deg;--r:90px;width:5px;height:5px;background:var(--magenta);box-shadow:0 0 6px rgba(194,24,91,.7);margin:-2.5px 0 0 -2.5px"></div>
+      <div class="p2-orb" style="--spd:7s;--s:240deg;--r:90px;width:6px;height:6px;background:var(--teal);margin:-3px 0 0 -3px"></div>
+      <img class="p2-logo"
+        src="Desi_Vibe_Logo-1.png"
+        alt="Desi Vibes"
+        onerror="this.src='Desi_Vibe_Logo.png';this.onerror=null">
     </div>
-
-    <!-- Wordmark -->
     <img class="p2-wordmark" src="Desi_vibes_word_only.png" alt="Desi Vibes — Where Tradition Meets Trend">
-
-    <!-- Divider -->
     <div class="p2-div"><div class="p2-dl"></div><div class="p2-dg"></div><div class="p2-dl"></div></div>
-
-    <!-- Typewriter -->
     <div class="p2-type">
       <div class="p2-l1" id="l1"></div>
       <div class="p2-l2" id="l2"></div>
     </div>
-
-    <!-- Enter Button -->
     <button class="p2-enter" id="enter-btn" onclick="enterSite()">
       Enter
       <div class="ea">
@@ -210,111 +234,262 @@ body.exit{animation:body-exit .6s forwards}
         </svg>
       </div>
     </button>
-
     <div class="p2-orn">✦ &nbsp; Authentic Indian Fashion &nbsp; ✦</div>
-
   </div>
 </div>
 
 <script>
-// ── RAYS ──
-const raysEl=document.getElementById('rays');
-for(let i=0;i<16;i++){
-  const r=document.createElement('div');r.className='ray';
-  const angle=(i/16)*360;
-  r.style.cssText=`transform:rotate(${angle}deg) translateX(-50%);height:${45+Math.random()*20}vh;width:${1+Math.random()*1.5}px;opacity:${.2+Math.random()*.4}`;
-  raysEl.appendChild(r);
+const canvas = document.getElementById('canvas');
+const ctx    = canvas.getContext('2d');
+let W, H, cx, cy;
+
+function resize(){
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  cx = W/2; cy = H/2;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ════════════════════════════════
+//  FIREWORK SYSTEM
+// ════════════════════════════════
+const COLORS = [
+  '#C9973A','#e8b84b','#f5d07a',   // golds
+  '#C2185B','#e91e8c','#ff6b9d',   // magentas
+  '#00897B','#00bfa5','#4dd0e1',   // teals
+  '#fff','#ffe082',                 // white/cream
+];
+
+class Spark {
+  constructor(x, y, color){
+    const a = Math.random() * Math.PI * 2;
+    const spd = 2 + Math.random() * 5;
+    this.x = x; this.y = y;
+    this.vx = Math.cos(a)*spd; this.vy = Math.sin(a)*spd;
+    this.alpha = 1;
+    this.decay = .012 + Math.random()*.018;
+    this.size  = 1.5 + Math.random()*2;
+    this.color = color;
+    this.gravity = .12;
+    this.trail = [];
+  }
+  update(){
+    this.trail.push({x:this.x,y:this.y});
+    if(this.trail.length > 6) this.trail.shift();
+    this.vy += this.gravity;
+    this.x += this.vx; this.y += this.vy;
+    this.vx *= .97; this.vy *= .97;
+    this.alpha -= this.decay;
+  }
+  draw(){
+    // Trail
+    for(let i=0;i<this.trail.length;i++){
+      const t = this.trail[i];
+      const a = (i/this.trail.length)*this.alpha*.5;
+      ctx.beginPath();
+      ctx.arc(t.x,t.y,this.size*.5,0,Math.PI*2);
+      ctx.fillStyle = this.color.replace(')',`,${a})`).replace('rgb','rgba');
+      // Use hex colors directly with opacity
+      ctx.globalAlpha = a;
+      ctx.fillStyle = this.color;
+      ctx.fill();
+    }
+    ctx.globalAlpha = this.alpha;
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+    ctx.fillStyle = this.color;
+    ctx.shadowBlur = 6; ctx.shadowColor = this.color;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
+  }
+  dead(){ return this.alpha <= 0; }
 }
 
-// ── CANVAS PARTICLES ──
-const canvas=document.getElementById('canvas');
-const ctx=canvas.getContext('2d');
-let W,H,cx,cy;
-function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;cx=W/2;cy=H/2}
-window.addEventListener('resize',resize);resize();
+class Firework {
+  constructor(){
+    // Launch from bottom, aim for upper area
+    this.x  = W * (.2 + Math.random()*.6);
+    this.y  = H;
+    this.tx = W * (.15 + Math.random()*.7);
+    this.ty = H * (.1 + Math.random()*.45);
+    const dx = this.tx-this.x, dy = this.ty-this.y;
+    const dist = Math.hypot(dx,dy);
+    this.spd = 14 + Math.random()*6;
+    this.vx = (dx/dist)*this.spd;
+    this.vy = (dy/dist)*this.spd;
+    this.color = COLORS[Math.floor(Math.random()*COLORS.length)];
+    this.exploded = false;
+    this.sparks = [];
+    this.trail = [];
+    this.alpha = 1;
+  }
+  update(){
+    if(!this.exploded){
+      this.trail.push({x:this.x,y:this.y});
+      if(this.trail.length>12) this.trail.shift();
+      this.x += this.vx; this.y += this.vy;
+      this.vy += .18; // gravity on rocket
+      // Explode when near target or moving up to down
+      if(this.vy >= 0 || Math.hypot(this.tx-this.x,this.ty-this.y) < 20){
+        this.explode();
+      }
+    } else {
+      for(let i=this.sparks.length-1;i>=0;i--){
+        this.sparks[i].update();
+        if(this.sparks[i].dead()) this.sparks.splice(i,1);
+      }
+    }
+  }
+  explode(){
+    this.exploded=true;
+    const count = 80 + Math.floor(Math.random()*60);
+    for(let i=0;i<count;i++) this.sparks.push(new Spark(this.x,this.y,this.color));
+    // Flash
+    const fl=document.getElementById('flash');
+    fl.style.opacity='.4'; setTimeout(()=>fl.style.opacity='0',80);
+  }
+  draw(){
+    if(!this.exploded){
+      // Rocket trail
+      for(let i=0;i<this.trail.length;i++){
+        const t=this.trail[i];
+        const a=(i/this.trail.length)*.8;
+        ctx.globalAlpha=a;
+        ctx.beginPath();ctx.arc(t.x,t.y,2,0,Math.PI*2);
+        ctx.fillStyle=this.color;ctx.fill();
+      }
+      ctx.globalAlpha=1;
+      ctx.beginPath();ctx.arc(this.x,this.y,3,0,Math.PI*2);
+      ctx.fillStyle=this.color;
+      ctx.shadowBlur=8;ctx.shadowColor=this.color;
+      ctx.fill();ctx.shadowBlur=0;
+    } else {
+      for(const s of this.sparks) s.draw();
+    }
+  }
+  done(){ return this.exploded && this.sparks.length===0; }
+}
 
-class Particle{
+// Converging gold particles (draw toward center after fireworks)
+class GoldParticle {
   constructor(){
     const a=Math.random()*Math.PI*2;
-    const d=Math.max(W,H)*(.5+Math.random()*.6);
+    const d=Math.max(W,H)*(.4+Math.random()*.5);
     this.x=cx+Math.cos(a)*d; this.y=cy+Math.sin(a)*d;
-    const ta=Math.random()*Math.PI*2;
-    const tr=Math.min(W,H)*(.05+Math.random()*.12);
-    this.tx=cx+Math.cos(ta)*tr; this.ty=cy+Math.sin(ta)*tr;
-    this.size=1+Math.random()*2.5;
-    this.alpha=0;this.done=false;
-    this.speed=.016+Math.random()*.014;
-    this.trail=[];this.delay=Math.random()*700;this.elapsed=0;
-    const p=['rgba(201,151,58,','rgba(232,184,75,','rgba(194,24,91,','rgba(0,137,123,','rgba(255,220,120,'];
-    this.col=p[Math.floor(Math.random()*p.length)];
+    this.tx=cx+(Math.random()-.5)*80; this.ty=cy+(Math.random()-.5)*80;
+    this.speed=.022+Math.random()*.015;
+    this.size=1+Math.random()*2;
+    this.alpha=0; this.delay=Math.random()*400; this.elapsed=0;
+    this.color=COLORS[Math.floor(Math.random()*3)]; // gold palette
+    this.trail=[];
   }
   update(dt){
-    this.elapsed+=dt;if(this.elapsed<this.delay)return;
+    this.elapsed+=dt; if(this.elapsed<this.delay)return;
     this.alpha=Math.min(1,(this.elapsed-this.delay)/300);
     this.trail.push({x:this.x,y:this.y});
-    if(this.trail.length>7)this.trail.shift();
+    if(this.trail.length>6)this.trail.shift();
     this.x+=(this.tx-this.x)*this.speed;
     this.y+=(this.ty-this.y)*this.speed;
-    if(Math.hypot(this.tx-this.x,this.ty-this.y)<1.5)this.done=true;
   }
   draw(){
     if(this.alpha<=0)return;
-    for(let i=0;i<this.trail.length;i++){
-      const t=this.trail[i];
-      ctx.beginPath();ctx.arc(t.x,t.y,this.size*.5,0,Math.PI*2);
-      ctx.fillStyle=this.col+(i/this.trail.length*this.alpha*.35)+')';ctx.fill();
+    ctx.globalAlpha=this.alpha*.5;
+    for(const t of this.trail){
+      ctx.beginPath();ctx.arc(t.x,t.y,this.size*.4,0,Math.PI*2);
+      ctx.fillStyle=this.color;ctx.fill();
     }
+    ctx.globalAlpha=this.alpha;
     ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
-    ctx.fillStyle=this.col+this.alpha+')';
-    ctx.shadowBlur=8;ctx.shadowColor=this.col+'.8)';
-    ctx.fill();ctx.shadowBlur=0;
+    ctx.fillStyle=this.color;
+    ctx.shadowBlur=6;ctx.shadowColor=this.color;
+    ctx.fill();ctx.shadowBlur=0;ctx.globalAlpha=1;
   }
 }
 
-// Make particles
-let particles=[];
-for(let i=0;i<280;i++) particles.push(new Particle());
-
-let lastT=null,startT=null,phase=0,animId;
+let fireworks  = [];
+let goldParts  = [];
+let lastT=null,startT=null;
+let animId;
+let phase=0;
 let typingDone=false;
 
+// Launch schedule: fireworks for ~3s then 3D logo reveal
+const FW_SCHEDULE = [200,400,650,900,1100,1350,1550,1750,1950,2150,2350,2500];
+
 function animate(ts){
-  if(!lastT)lastT=ts;if(!startT)startT=ts;
-  const dt=ts-lastT;lastT=ts;
+  if(!lastT)lastT=ts;
+  if(!startT)startT=ts;
+  const dt=ts-lastT; lastT=ts;
   const elapsed=ts-startT;
+
   ctx.clearRect(0,0,W,H);
-  for(const p of particles){p.update(dt);p.draw();}
-  if(elapsed>1800&&phase===0){phase=1;doReveal();}
+
+  // Dark radial bg
+  const g=ctx.createRadialGradient(cx,cy,0,cx,cy,Math.max(W,H)*.7);
+  g.addColorStop(0,'rgba(25,12,0,.3)');
+  g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+  // Launch fireworks on schedule
+  for(const t of FW_SCHEDULE){
+    if(elapsed>t && elapsed<t+50 && phase===0){
+      fireworks.push(new Firework());
+    }
+  }
+
+  // Update fireworks
+  for(let i=fireworks.length-1;i>=0;i--){
+    fireworks[i].update(); fireworks[i].draw();
+    if(fireworks[i].done()) fireworks.splice(i,1);
+  }
+
+  // At 2.8s — open bars + show 3D logo
+  if(elapsed>2800 && phase===0){
+    phase=1;
+    // Open cinematic bars
+    document.getElementById('bar-top').classList.add('open');
+    document.getElementById('bar-bottom').classList.add('open');
+    // Show phase1 logo with 3D flip
+    document.getElementById('phase1').classList.add('show');
+    setTimeout(()=>{
+      document.getElementById('p1-logo').classList.add('reveal');
+    },100);
+    // Rings appear after logo flips in
+    setTimeout(()=>{
+      document.getElementById('pr1').classList.add('show');
+      document.getElementById('pr2').classList.add('show');
+      document.getElementById('pr3').classList.add('show');
+      document.getElementById('p1-logo').classList.add('pulse');
+      // Start gold converging particles
+      for(let i=0;i<120;i++) goldParts.push(new GoldParticle());
+    },1200);
+    // After 2.5s on logo, transition to phase2
+    setTimeout(doPhase2, 4000);
+  }
+
+  // Gold particles
+  for(const p of goldParts){ p.update(dt); p.draw(); }
+
+  // Fade canvas when transitioning
   animId=requestAnimationFrame(animate);
 }
 
-function doReveal(){
-  // Flash
-  const fl=document.getElementById('flash');
-  fl.classList.add('go');setTimeout(()=>fl.classList.remove('go'),180);
-  // Show phase1 logo
-  setTimeout(()=>{document.getElementById('phase1').classList.add('show');},100);
-  // Rays + glow
-  setTimeout(()=>{document.getElementById('rays').classList.add('show');document.getElementById('glow').classList.add('show');},200);
-  // Open bars
-  setTimeout(()=>{document.getElementById('bar-top').classList.add('open');document.getElementById('bar-bottom').classList.add('open');},400);
-  // After 2.5s on phase1 logo — crossfade to phase2
-  setTimeout(()=>{
-    document.getElementById('phase1').classList.add('hide');
-    document.getElementById('phase2').classList.add('show');
-    // Start typewriter
-    setTimeout(startTyping,600);
-    // Fade particles
-    fadeCanvas();
-  },2600);
-}
-
-function fadeCanvas(){
+function doPhase2(){
+  // Fade phase1 out
+  document.getElementById('phase1').classList.add('hide');
+  // Fade canvas
   let a=1;
   const iv=setInterval(()=>{
-    a-=.02;canvas.style.opacity=Math.max(0,a);
+    a-=.025; canvas.style.opacity=Math.max(0,a);
     if(a<=0){clearInterval(iv);cancelAnimationFrame(animId);}
   },30);
+  // Show phase2
+  setTimeout(()=>{
+    document.getElementById('phase2').classList.add('show');
+    setTimeout(startTyping,500);
+  },600);
 }
 
 // ── TYPEWRITER ──
@@ -333,12 +508,12 @@ function startTyping(){
 }
 
 function typeText(el,text,speed,cb){
-  let i=0;el.innerHTML='<span class="cursor"></span>';
+  let i=0; el.innerHTML='<span class="cursor"></span>';
   function tick(){
     if(i<text.length){
       el.innerHTML=text.substring(0,i+1)+'<span class="cursor"></span>';
-      i++;setTimeout(tick,speed+(Math.random()*20-10));
-    } else {setTimeout(()=>{el.innerHTML=text;if(cb)cb();},380);}
+      i++; setTimeout(tick,speed+(Math.random()*20-10));
+    } else { setTimeout(()=>{ el.innerHTML=text; if(cb)cb(); },380); }
   }
   tick();
 }
@@ -346,11 +521,10 @@ function typeText(el,text,speed,cb){
 function enterSite(){
   if(!typingDone)return;
   document.body.classList.add('exit');
-  setTimeout(()=>{window.location.href='customer_catalog.html';},620);
+  setTimeout(()=>{ window.location.href='customer_catalog.html'; },620);
 }
-document.addEventListener('keydown',e=>{if(e.key==='Enter'&&typingDone)enterSite();});
+document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&typingDone)enterSite(); });
 
-// Start
 requestAnimationFrame(animate);
 </script>
 </body>
