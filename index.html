@@ -1,11 +1,340 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="0; url=customer_catalog.html">
-<title>Desi Vibes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#000000">
+<title>Desi Vibes — Where Tradition Meets Trend</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --gold:#C9973A;
+  --gold-bright:#e8b84b;
+  --gold-dim:#8a6520;
+  --gold-border:rgba(201,151,58,.3);
+  --magenta:#C2185B;
+  --black:#080808;
+}
+html,body{width:100%;height:100%;overflow:hidden}
+body{
+  background:var(--black);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'Inter',sans-serif;
+  min-height:100vh;
+}
+
+/* BACKGROUND RADIAL GLOW */
+.bg-glow{
+  position:fixed;inset:0;
+  background:radial-gradient(ellipse at 50% 40%, rgba(201,151,58,.08) 0%, transparent 65%);
+  pointer-events:none;
+}
+
+/* PARTICLE DOTS */
+.particles{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.particle{
+  position:absolute;
+  width:2px;height:2px;
+  background:var(--gold);
+  border-radius:50%;
+  opacity:0;
+  animation:float-up var(--dur) var(--delay) infinite ease-in;
+}
+@keyframes float-up{
+  0%{opacity:0;transform:translateY(0) scale(1)}
+  20%{opacity:.6}
+  80%{opacity:.2}
+  100%{opacity:0;transform:translateY(-100vh) scale(0.5)}
+}
+
+/* MAIN CONTAINER */
+.splash{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:2rem 1.5rem;
+  position:relative;
+  z-index:10;
+  opacity:0;
+  animation:fade-in .8s .3s forwards;
+}
+@keyframes fade-in{to{opacity:1}}
+
+/* SPINNING LOGO */
+.logo-stage{
+  position:relative;
+  width:min(220px,60vw);
+  height:min(220px,60vw);
+  margin:0 auto 1.75rem;
+}
+
+/* Outer spinning ring */
+.ring-outer{
+  position:absolute;
+  inset:-16px;
+  border-radius:50%;
+  border:1px solid rgba(201,151,58,.25);
+  border-top-color:var(--gold);
+  animation:spin-cw 4s linear infinite;
+}
+/* Middle spinning ring */
+.ring-mid{
+  position:absolute;
+  inset:-6px;
+  border-radius:50%;
+  border:1px dashed rgba(201,151,58,.2);
+  border-bottom-color:rgba(201,151,58,.5);
+  animation:spin-ccw 6s linear infinite;
+}
+/* Inner glow ring */
+.ring-inner{
+  position:absolute;
+  inset:4px;
+  border-radius:50%;
+  border:1px solid rgba(201,151,58,.1);
+  animation:spin-cw 10s linear infinite;
+}
+
+@keyframes spin-cw{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes spin-ccw{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
+
+/* LOGO IMAGE */
+.logo-img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  border-radius:50%;
+  animation:logo-breathe 3s ease-in-out infinite;
+  filter:drop-shadow(0 0 20px rgba(201,151,58,.4)) drop-shadow(0 0 50px rgba(201,151,58,.15));
+}
+@keyframes logo-breathe{
+  0%,100%{filter:drop-shadow(0 0 15px rgba(201,151,58,.3)) drop-shadow(0 0 40px rgba(201,151,58,.1));transform:scale(1)}
+  50%{filter:drop-shadow(0 0 30px rgba(201,151,58,.6)) drop-shadow(0 0 70px rgba(201,151,58,.25));transform:scale(1.03)}
+}
+
+/* ORNAMENT DOTS around logo */
+.orbit-dot{
+  position:absolute;
+  width:6px;height:6px;
+  background:var(--gold);
+  border-radius:50%;
+  top:50%;left:50%;
+  margin:-3px 0 0 -3px;
+  animation:orbit var(--speed) linear infinite;
+  opacity:.7;
+}
+@keyframes orbit{
+  from{transform:rotate(var(--start)) translateX(var(--r)) rotate(calc(-1 * var(--start)))}
+  to{transform:rotate(calc(var(--start) + 360deg)) translateX(var(--r)) rotate(calc(-1 * (var(--start) + 360deg)))}
+}
+
+/* STORE NAME */
+.store-name{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2rem,8vw,3rem);
+  font-weight:700;
+  color:var(--gold);
+  letter-spacing:.06em;
+  line-height:1;
+  margin-bottom:.35rem;
+  animation:slide-up .6s .8s both;
+}
+@keyframes slide-up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* TAGLINE */
+.tagline{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(.8rem,3vw,1rem);
+  font-style:italic;
+  color:var(--gold-dim);
+  letter-spacing:.12em;
+  margin-bottom:1.75rem;
+  animation:slide-up .6s 1s both;
+}
+
+/* DIVIDER */
+.divider{
+  display:flex;align-items:center;gap:.75rem;
+  margin:0 auto 1.75rem;
+  width:min(200px,50vw);
+  animation:slide-up .6s 1.1s both;
+}
+.div-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-border),transparent)}
+.div-gem{
+  width:6px;height:6px;
+  background:var(--magenta);
+  transform:rotate(45deg);
+  flex-shrink:0;
+  box-shadow:0 0 8px rgba(194,24,91,.5);
+}
+
+/* WELCOME TEXT */
+.welcome-text{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(1.6rem,6vw,2.2rem);
+  font-weight:600;
+  color:#fff;
+  letter-spacing:.1em;
+  margin-bottom:2rem;
+  animation:slide-up .6s 1.2s both;
+}
+.welcome-text span{
+  color:var(--gold);
+  font-style:italic;
+}
+
+/* ENTER BUTTON */
+.enter-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:.65rem;
+  background:transparent;
+  color:var(--gold);
+  border:1px solid var(--gold-border);
+  border-radius:40px;
+  padding:.85rem 2.5rem;
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.1rem;
+  font-weight:600;
+  letter-spacing:.14em;
+  cursor:pointer;
+  text-transform:uppercase;
+  position:relative;
+  overflow:hidden;
+  animation:slide-up .6s 1.4s both;
+  transition:.3s;
+}
+.enter-btn::before{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(201,151,58,.08),rgba(201,151,58,.15));
+  opacity:0;
+  transition:.3s;
+}
+.enter-btn:hover::before,.enter-btn:active::before{opacity:1}
+.enter-btn:hover{
+  border-color:var(--gold);
+  box-shadow:0 0 20px rgba(201,151,58,.2),0 0 40px rgba(201,151,58,.08);
+  transform:translateY(-2px);
+}
+.enter-btn:active{transform:scale(.97)}
+.btn-arrow{
+  width:18px;height:18px;
+  border:1.5px solid var(--gold);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+
+/* BOTTOM ORNAMENT */
+.bottom-orn{
+  margin-top:2rem;
+  font-size:.65rem;
+  letter-spacing:.2em;
+  color:rgba(201,151,58,.25);
+  text-transform:uppercase;
+  animation:slide-up .6s 1.6s both;
+}
+
+/* EXIT ANIMATION */
+.splash.exit{animation:splash-exit .6s forwards}
+@keyframes splash-exit{
+  to{opacity:0;transform:scale(1.04)}
+}
+
+/* MOBILE */
+@media(max-width:380px){
+  .logo-stage{width:160px;height:160px}
+  .enter-btn{padding:.75rem 2rem;font-size:1rem}
+}
+</style>
 </head>
 <body>
-<script>window.location.href = "customer_catalog.html";</script>
+
+<div class="bg-glow"></div>
+
+<!-- Floating particles -->
+<div class="particles" id="particles"></div>
+
+<div class="splash" id="splash">
+
+  <!-- Spinning Logo -->
+  <div class="logo-stage">
+    <div class="ring-outer"></div>
+    <div class="ring-mid"></div>
+    <div class="ring-inner"></div>
+    <!-- Orbiting dots -->
+    <div class="orbit-dot" style="--speed:3s;--start:0deg;--r:118px"></div>
+    <div class="orbit-dot" style="--speed:5s;--start:120deg;--r:118px;background:var(--magenta);width:4px;height:4px"></div>
+    <div class="orbit-dot" style="--speed:7s;--start:240deg;--r:118px;background:#00897B;width:5px;height:5px"></div>
+    <img class="logo-img" src="Desi_Vibe_Logo.png" alt="Desi Vibes Logo" onerror="this.style.opacity='.1'">
+  </div>
+
+  <!-- Store Name -->
+  <div class="store-name">Desi Vibes</div>
+  <div class="tagline">Where Tradition Meets Trend</div>
+
+  <!-- Divider -->
+  <div class="divider">
+    <div class="div-line"></div>
+    <div class="div-gem"></div>
+    <div class="div-line"></div>
+  </div>
+
+  <!-- Welcome -->
+  <div class="welcome-text"><span>Welcome</span> to Our Collection</div>
+
+  <!-- Enter Button -->
+  <button class="enter-btn" onclick="enterSite()">
+    Enter
+    <div class="btn-arrow">
+      <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+        <path d="M1.5 4h5M4 1.5L6.5 4 4 6.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </button>
+
+  <div class="bottom-orn">✦ &nbsp; Authentic Indian Fashion &nbsp; ✦</div>
+
+</div>
+
+<script>
+// Generate floating particles
+const container = document.getElementById('particles');
+for(let i = 0; i < 25; i++){
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.style.cssText = `
+    left:${Math.random()*100}%;
+    top:${Math.random()*100}%;
+    --dur:${4 + Math.random()*8}s;
+    --delay:${Math.random()*6}s;
+    width:${1+Math.random()*2}px;
+    height:${1+Math.random()*2}px;
+    opacity:${0.2+Math.random()*0.4};
+  `;
+  container.appendChild(p);
+}
+
+function enterSite(){
+  const splash = document.getElementById('splash');
+  splash.classList.add('exit');
+  setTimeout(()=>{
+    window.location.href = 'customer_catalog.html';
+  }, 600);
+}
+
+// Also allow keyboard Enter key
+document.addEventListener('keydown', e=>{
+  if(e.key === 'Enter') enterSite();
+});
+</script>
 </body>
 </html>
