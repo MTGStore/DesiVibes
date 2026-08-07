@@ -14,6 +14,7 @@
   --gold-dim:#8a6520;
   --gold-border:rgba(201,151,58,.3);
   --magenta:#C2185B;
+  --teal:#00897B;
   --black:#080808;
 }
 html,body{width:100%;height:100%;overflow:hidden}
@@ -26,31 +27,29 @@ body{
   min-height:100vh;
 }
 
-/* BACKGROUND RADIAL GLOW */
+/* BACKGROUND GLOW */
 .bg-glow{
   position:fixed;inset:0;
-  background:radial-gradient(ellipse at 50% 40%, rgba(201,151,58,.08) 0%, transparent 65%);
+  background:radial-gradient(ellipse at 50% 40%,rgba(201,151,58,.07) 0%,transparent 65%);
   pointer-events:none;
 }
 
-/* PARTICLE DOTS */
+/* PARTICLES */
 .particles{position:fixed;inset:0;pointer-events:none;overflow:hidden}
 .particle{
   position:absolute;
-  width:2px;height:2px;
-  background:var(--gold);
   border-radius:50%;
   opacity:0;
   animation:float-up var(--dur) var(--delay) infinite ease-in;
 }
 @keyframes float-up{
-  0%{opacity:0;transform:translateY(0) scale(1)}
-  20%{opacity:.6}
-  80%{opacity:.2}
-  100%{opacity:0;transform:translateY(-100vh) scale(0.5)}
+  0%{opacity:0;transform:translateY(0)}
+  20%{opacity:.5}
+  80%{opacity:.15}
+  100%{opacity:0;transform:translateY(-100vh)}
 }
 
-/* MAIN CONTAINER */
+/* SPLASH */
 .splash{
   display:flex;
   flex-direction:column;
@@ -60,137 +59,159 @@ body{
   padding:2rem 1.5rem;
   position:relative;
   z-index:10;
-  opacity:0;
-  animation:fade-in .8s .3s forwards;
 }
-@keyframes fade-in{to{opacity:1}}
 
-/* SPINNING LOGO */
+/* ── LOGO STAGE ── */
 .logo-stage{
   position:relative;
-  width:min(220px,60vw);
-  height:min(220px,60vw);
-  margin:0 auto 1.75rem;
+  width:min(210px,58vw);
+  height:min(210px,58vw);
+  margin:0 auto 1.6rem;
 }
 
-/* Outer spinning ring */
+/* Logo pops in + spins 360 once, then stops */
+.logo-img{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:contain;
+  border-radius:50%;
+  opacity:0;
+  /* Step 1: pop in (scale from 0) */
+  animation:
+    logo-pop-in .5s .2s cubic-bezier(.34,1.56,.64,1) forwards,
+    logo-spin-once 1s .7s cubic-bezier(.4,0,.2,1) forwards,
+    logo-glow 3s 2s ease-in-out infinite;
+}
+@keyframes logo-pop-in{
+  0%{opacity:0;transform:scale(0) rotate(-30deg)}
+  100%{opacity:1;transform:scale(1) rotate(0deg)}
+}
+@keyframes logo-spin-once{
+  0%{transform:scale(1) rotate(0deg)}
+  100%{transform:scale(1) rotate(360deg)}
+}
+@keyframes logo-glow{
+  0%,100%{filter:drop-shadow(0 0 12px rgba(201,151,58,.3)) drop-shadow(0 0 30px rgba(201,151,58,.1))}
+  50%{filter:drop-shadow(0 0 28px rgba(201,151,58,.6)) drop-shadow(0 0 60px rgba(201,151,58,.25))}
+}
+
+/* Rings — start after logo finishes spin */
 .ring-outer{
-  position:absolute;
-  inset:-16px;
+  position:absolute;inset:-16px;
   border-radius:50%;
-  border:1px solid rgba(201,151,58,.25);
+  border:1px solid rgba(201,151,58,.18);
   border-top-color:var(--gold);
-  animation:spin-cw 4s linear infinite;
+  opacity:0;
+  animation:ring-appear .5s 1.8s forwards, spin-cw 5s 1.8s linear infinite;
 }
-/* Middle spinning ring */
 .ring-mid{
-  position:absolute;
-  inset:-6px;
+  position:absolute;inset:-6px;
   border-radius:50%;
-  border:1px dashed rgba(201,151,58,.2);
-  border-bottom-color:rgba(201,151,58,.5);
-  animation:spin-ccw 6s linear infinite;
+  border:1px dashed rgba(201,151,58,.15);
+  border-bottom-color:rgba(201,151,58,.45);
+  opacity:0;
+  animation:ring-appear .5s 2s forwards, spin-ccw 8s 2s linear infinite;
 }
-/* Inner glow ring */
 .ring-inner{
-  position:absolute;
-  inset:4px;
+  position:absolute;inset:5px;
   border-radius:50%;
-  border:1px solid rgba(201,151,58,.1);
-  animation:spin-cw 10s linear infinite;
+  border:1px solid rgba(201,151,58,.08);
+  opacity:0;
+  animation:ring-appear .5s 2.2s forwards, spin-cw 12s 2.2s linear infinite;
 }
-
+@keyframes ring-appear{to{opacity:1}}
 @keyframes spin-cw{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 @keyframes spin-ccw{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
 
-/* LOGO IMAGE */
-.logo-img{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  border-radius:50%;
-  animation:logo-breathe 3s ease-in-out infinite;
-  filter:drop-shadow(0 0 20px rgba(201,151,58,.4)) drop-shadow(0 0 50px rgba(201,151,58,.15));
-}
-@keyframes logo-breathe{
-  0%,100%{filter:drop-shadow(0 0 15px rgba(201,151,58,.3)) drop-shadow(0 0 40px rgba(201,151,58,.1));transform:scale(1)}
-  50%{filter:drop-shadow(0 0 30px rgba(201,151,58,.6)) drop-shadow(0 0 70px rgba(201,151,58,.25));transform:scale(1.03)}
-}
-
-/* ORNAMENT DOTS around logo */
+/* Orbiting dots — appear after rings */
 .orbit-dot{
   position:absolute;
-  width:6px;height:6px;
-  background:var(--gold);
   border-radius:50%;
   top:50%;left:50%;
-  margin:-3px 0 0 -3px;
-  animation:orbit var(--speed) linear infinite;
-  opacity:.7;
+  opacity:0;
+  animation:ring-appear .5s 2.4s forwards, orbit var(--speed) 2.4s linear infinite;
 }
 @keyframes orbit{
   from{transform:rotate(var(--start)) translateX(var(--r)) rotate(calc(-1 * var(--start)))}
   to{transform:rotate(calc(var(--start) + 360deg)) translateX(var(--r)) rotate(calc(-1 * (var(--start) + 360deg)))}
 }
 
-/* STORE NAME */
+/* ── STORE NAME ── */
 .store-name{
   font-family:'Cormorant Garamond',serif;
-  font-size:clamp(2rem,8vw,3rem);
+  font-size:clamp(2rem,8vw,2.8rem);
   font-weight:700;
   color:var(--gold);
   letter-spacing:.06em;
   line-height:1;
-  margin-bottom:.35rem;
-  animation:slide-up .6s .8s both;
+  margin-bottom:.3rem;
+  opacity:0;
+  animation:fade-up .6s 1.9s forwards;
 }
-@keyframes slide-up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-
-/* TAGLINE */
 .tagline{
   font-family:'Cormorant Garamond',serif;
-  font-size:clamp(.8rem,3vw,1rem);
+  font-size:clamp(.75rem,2.8vw,.9rem);
   font-style:italic;
   color:var(--gold-dim);
   letter-spacing:.12em;
-  margin-bottom:1.75rem;
-  animation:slide-up .6s 1s both;
+  margin-bottom:1.5rem;
+  opacity:0;
+  animation:fade-up .6s 2.1s forwards;
+}
+@keyframes fade-up{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:translateY(0)}
 }
 
 /* DIVIDER */
 .divider{
-  display:flex;align-items:center;gap:.75rem;
-  margin:0 auto 1.75rem;
-  width:min(200px,50vw);
-  animation:slide-up .6s 1.1s both;
+  display:flex;align-items:center;gap:.65rem;
+  margin:0 auto 1.6rem;
+  width:min(180px,48vw);
+  opacity:0;
+  animation:fade-up .5s 2.3s forwards;
 }
 .div-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-border),transparent)}
-.div-gem{
-  width:6px;height:6px;
-  background:var(--magenta);
-  transform:rotate(45deg);
-  flex-shrink:0;
-  box-shadow:0 0 8px rgba(194,24,91,.5);
-}
+.div-gem{width:6px;height:6px;background:var(--magenta);transform:rotate(45deg);flex-shrink:0;box-shadow:0 0 8px rgba(194,24,91,.5)}
 
-/* WELCOME TEXT */
-.welcome-text{
+/* ── TYPEWRITER TEXT ── */
+.type-wrap{
+  min-height:3.8rem;
+  margin-bottom:1.75rem;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:.4rem;
+}
+.type-line1{
   font-family:'Cormorant Garamond',serif;
   font-size:clamp(1.6rem,6vw,2.2rem);
-  font-weight:600;
+  font-weight:700;
   color:#fff;
   letter-spacing:.1em;
-  margin-bottom:2rem;
-  animation:slide-up .6s 1.2s both;
+  min-height:1.3em;
 }
-.welcome-text span{
-  color:var(--gold);
+.type-line1 .gold{color:var(--gold);font-style:italic}
+.type-line2{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(.85rem,3vw,1rem);
+  color:rgba(201,151,58,.7);
+  letter-spacing:.07em;
   font-style:italic;
+  min-height:1.4em;
 }
+/* Blinking cursor */
+.cursor{
+  display:inline-block;
+  width:2px;height:1em;
+  background:var(--gold);
+  margin-left:2px;
+  vertical-align:middle;
+  animation:blink .7s step-end infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
-/* ENTER BUTTON */
+/* ── ENTER BUTTON ── */
 .enter-btn{
   display:inline-flex;
   align-items:center;
@@ -206,97 +227,99 @@ body{
   letter-spacing:.14em;
   cursor:pointer;
   text-transform:uppercase;
+  opacity:0;
+  transform:translateY(14px);
+  transition:opacity .5s, transform .5s, box-shadow .3s, border-color .3s;
   position:relative;
   overflow:hidden;
-  animation:slide-up .6s 1.4s both;
-  transition:.3s;
+}
+.enter-btn.visible{
+  opacity:1;
+  transform:translateY(0);
 }
 .enter-btn::before{
   content:'';
   position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(201,151,58,.08),rgba(201,151,58,.15));
-  opacity:0;
-  transition:.3s;
+  background:linear-gradient(135deg,rgba(201,151,58,.06),rgba(201,151,58,.14));
+  opacity:0;transition:.3s;
 }
 .enter-btn:hover::before,.enter-btn:active::before{opacity:1}
 .enter-btn:hover{
   border-color:var(--gold);
-  box-shadow:0 0 20px rgba(201,151,58,.2),0 0 40px rgba(201,151,58,.08);
+  box-shadow:0 0 24px rgba(201,151,58,.2),0 0 48px rgba(201,151,58,.08);
   transform:translateY(-2px);
 }
 .enter-btn:active{transform:scale(.97)}
 .btn-arrow{
-  width:18px;height:18px;
+  width:20px;height:20px;
   border:1.5px solid var(--gold);
   border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   flex-shrink:0;
 }
 
-/* BOTTOM ORNAMENT */
+/* BOTTOM TAG */
 .bottom-orn{
-  margin-top:2rem;
-  font-size:.65rem;
+  margin-top:1.6rem;
+  font-size:.6rem;
   letter-spacing:.2em;
-  color:rgba(201,151,58,.25);
+  color:rgba(201,151,58,.2);
   text-transform:uppercase;
-  animation:slide-up .6s 1.6s both;
+  opacity:0;
+  animation:fade-up .5s 2.4s forwards;
 }
 
-/* EXIT ANIMATION */
-.splash.exit{animation:splash-exit .6s forwards}
-@keyframes splash-exit{
-  to{opacity:0;transform:scale(1.04)}
-}
+/* EXIT */
+.splash.exit{animation:splash-exit .55s forwards}
+@keyframes splash-exit{to{opacity:0;transform:scale(1.03)}}
 
-/* MOBILE */
 @media(max-width:380px){
-  .logo-stage{width:160px;height:160px}
-  .enter-btn{padding:.75rem 2rem;font-size:1rem}
+  .logo-stage{width:155px;height:155px}
+  .enter-btn{padding:.72rem 1.8rem;font-size:.98rem}
 }
 </style>
 </head>
 <body>
 
 <div class="bg-glow"></div>
-
-<!-- Floating particles -->
 <div class="particles" id="particles"></div>
 
 <div class="splash" id="splash">
 
-  <!-- Spinning Logo -->
+  <!-- LOGO -->
   <div class="logo-stage">
     <div class="ring-outer"></div>
     <div class="ring-mid"></div>
     <div class="ring-inner"></div>
-    <!-- Orbiting dots -->
-    <div class="orbit-dot" style="--speed:3s;--start:0deg;--r:118px"></div>
-    <div class="orbit-dot" style="--speed:5s;--start:120deg;--r:118px;background:var(--magenta);width:4px;height:4px"></div>
-    <div class="orbit-dot" style="--speed:7s;--start:240deg;--r:118px;background:#00897B;width:5px;height:5px"></div>
-    <img class="logo-img" src="Desi_Vibe_Logo.png" alt="Desi Vibes Logo" onerror="this.style.opacity='.1'">
+    <div class="orbit-dot" style="--speed:3s;--start:0deg;--r:114px;width:6px;height:6px;background:var(--gold);margin:-3px 0 0 -3px"></div>
+    <div class="orbit-dot" style="--speed:5s;--start:120deg;--r:114px;width:4px;height:4px;background:var(--magenta);margin:-2px 0 0 -2px"></div>
+    <div class="orbit-dot" style="--speed:7s;--start:240deg;--r:114px;width:5px;height:5px;background:var(--teal);margin:-2.5px 0 0 -2.5px"></div>
+    <img class="logo-img" src="Desi_Vibe_Logo.png" alt="Desi Vibes" onerror="this.style.opacity='.08'">
   </div>
 
-  <!-- Store Name -->
+  <!-- STORE NAME -->
   <div class="store-name">Desi Vibes</div>
   <div class="tagline">Where Tradition Meets Trend</div>
 
-  <!-- Divider -->
+  <!-- DIVIDER -->
   <div class="divider">
     <div class="div-line"></div>
     <div class="div-gem"></div>
     <div class="div-line"></div>
   </div>
 
-  <!-- Welcome -->
-  <div class="welcome-text"><span>Welcome</span> to Our Collection</div>
+  <!-- TYPEWRITER -->
+  <div class="type-wrap">
+    <div class="type-line1" id="line1"></div>
+    <div class="type-line2" id="line2"></div>
+  </div>
 
-  <!-- Enter Button -->
-  <button class="enter-btn" onclick="enterSite()">
+  <!-- ENTER BUTTON -->
+  <button class="enter-btn" id="enter-btn" onclick="enterSite()">
     Enter
     <div class="btn-arrow">
-      <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-        <path d="M1.5 4h5M4 1.5L6.5 4 4 6.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+        <path d="M2 4.5h5M5 2l2.5 2.5L5 7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
   </button>
@@ -306,34 +329,81 @@ body{
 </div>
 
 <script>
-// Generate floating particles
-const container = document.getElementById('particles');
-for(let i = 0; i < 25; i++){
-  const p = document.createElement('div');
-  p.className = 'particle';
-  p.style.cssText = `
-    left:${Math.random()*100}%;
-    top:${Math.random()*100}%;
-    --dur:${4 + Math.random()*8}s;
-    --delay:${Math.random()*6}s;
-    width:${1+Math.random()*2}px;
-    height:${1+Math.random()*2}px;
-    opacity:${0.2+Math.random()*0.4};
-  `;
-  container.appendChild(p);
+// ── PARTICLES ──
+const pc = document.getElementById('particles');
+for(let i=0;i<28;i++){
+  const p=document.createElement('div');
+  p.className='particle';
+  const size=1+Math.random()*2.5;
+  p.style.cssText=`left:${Math.random()*100}%;top:${80+Math.random()*30}%;width:${size}px;height:${size}px;background:${Math.random()>.7?'#C2185B':Math.random()>.5?'#00897B':'#C9973A'};--dur:${5+Math.random()*9}s;--delay:${Math.random()*7}s`;
+  pc.appendChild(p);
 }
 
+// ── TYPEWRITER ──
+// Line 1 starts at 2.8s after page load
+// Line 2 starts after line 1 finishes
+// Button appears after line 2 finishes
+
+const LINE1 = 'Welcome';
+const LINE2 = 'Click below to Enter our Collection';
+const SPEED1 = 110; // ms per character
+const SPEED2 = 55;
+const LINE1_START = 2800; // ms
+const LINE2_PAUSE = 600;  // pause between lines
+
+let typingDone = false;
+
+function typeText(el, text, speed, onDone){
+  let i = 0;
+  el.innerHTML = '<span class="cursor"></span>';
+  function tick(){
+    if(i < text.length){
+      // Insert char before cursor
+      el.innerHTML = text.substring(0,i+1) + '<span class="cursor"></span>';
+      i++;
+      setTimeout(tick, speed + (Math.random()*30 - 15));
+    } else {
+      // Remove cursor blink after done, keep static cursor briefly
+      setTimeout(()=>{
+        el.innerHTML = text;
+        if(onDone) onDone();
+      }, 400);
+    }
+  }
+  tick();
+}
+
+// Line 1 — "Welcome" (with gold styling)
+setTimeout(()=>{
+  const el1 = document.getElementById('line1');
+  typeText(el1, 'Welcome', SPEED1, ()=>{
+    // Style "Welcome" in gold after typing
+    el1.innerHTML = '<span class="gold">Welcome</span>';
+    // Start line 2 after pause
+    setTimeout(()=>{
+      const el2 = document.getElementById('line2');
+      typeText(el2, LINE2, SPEED2, ()=>{
+        // Show button after line 2 done
+        setTimeout(()=>{
+          document.getElementById('enter-btn').classList.add('visible');
+          typingDone = true;
+        }, 300);
+      });
+    }, LINE2_PAUSE);
+  });
+}, LINE1_START);
+
+// ── ENTER SITE ──
 function enterSite(){
+  if(!typingDone) return; // Don't allow until typing done
   const splash = document.getElementById('splash');
   splash.classList.add('exit');
-  setTimeout(()=>{
-    window.location.href = 'customer_catalog.html';
-  }, 600);
+  setTimeout(()=>{ window.location.href = 'customer_catalog.html'; }, 580);
 }
 
-// Also allow keyboard Enter key
+// Keyboard Enter key (only after typing done)
 document.addEventListener('keydown', e=>{
-  if(e.key === 'Enter') enterSite();
+  if(e.key==='Enter' && typingDone) enterSite();
 });
 </script>
 </body>
