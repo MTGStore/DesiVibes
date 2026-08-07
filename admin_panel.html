@@ -241,7 +241,13 @@ tr:hover td{background:rgba(201,151,58,.03)}
     <!-- ADD ITEM -->
     <div id="pane-add" class="pane">
       <div class="section">
-        <div class="sec-head"><h2>➕ Add New Item</h2></div>
+        <div class="sec-head">
+          <h2 id="form-title">➕ Add New Item</h2>
+          <button id="cancel-edit-btn" class="btn btn-outline" style="display:none;font-size:.75rem;padding:.32rem .7rem" onclick="cancelEdit()">✕ Cancel Edit</button>
+        </div>
+        <div id="edit-mode-banner" style="display:none;background:rgba(201,151,58,.08);border:1px solid var(--gold-border);border-radius:var(--radius);padding:.55rem .85rem;margin-bottom:.85rem;font-size:.78rem;color:var(--gold)">
+          ✏️ Editing item — <span id="edit-item-label" style="font-weight:700"></span>. Change any fields then click <strong>Update Item</strong>.
+        </div>
         <div class="sec-body">
           <div class="form-grid">
             <div class="fg"><label>Batch # *</label><input type="text" id="f-batch" placeholder="e.g. Batch 1, Aug 2026" style="border-color:rgba(201,151,58,.5)"></div>
@@ -431,7 +437,7 @@ window.addEventListener('load',()=>{
 let products=JSON.parse(localStorage.getItem('clothing_products')||'[]');
 let sales=JSON.parse(localStorage.getItem('clothing_sales')||'[]');
 let curImg='';
-let curPhotos=[]; // array of URLs for multi-photo
+let curPhotos=[];
 
 function renderPhotoSlots(){
   const wrap=document.getElementById('photo-slots');
@@ -591,7 +597,7 @@ function renderInventory(){
         ${isActive?`<button class="act-btn act-sell" onclick="markSold('${p.id}')">Sold</button>`:''}
         ${isActive?`<button class="act-btn" style="background:rgba(251,140,0,.12);color:#fb8c00;border-color:#fb8c00;font-size:.7rem" onclick="markPending('${p.id}')">Pending</button>`:''}
         ${(isSold||isPending)?`<button class="act-btn act-relist" onclick="relistItem('${p.id}')">Relist</button>`:''}
-<button class="act-btn" style="background:rgba(0,137,123,.12);color:var(--teal);border-color:var(--teal);font-size:.7rem" onclick="editPhotos('${p.id}')">📷 Photos</button>
+<button class="act-btn" style="background:rgba(201,151,58,.12);color:var(--gold);border-color:var(--gold);font-size:.7rem" onclick="editItem('${p.id}')">✏️ Edit</button>
         <button class="act-btn" style="background:rgba(21,101,192,.12);color:#64b5f6;border-color:#1565c0" onclick="deleteProduct('${p.id}')">Del</button>
       </td></tr>`;  }).join('');
 }
@@ -836,38 +842,91 @@ function exportBatchCSV(){
 }
 
 
-// ── EDIT PHOTOS for existing item ──
-function editPhotos(id){
+// ── EDIT EXISTING ITEM ──
+let editingId = null; // null = add mode, string = edit mode
+
+function editItem(id){
   const p=products.find(x=>x.id===id); if(!p) return;
-  // Go to Add tab and pre-populate with this item's data for photo editing
-  switchTab('add', document.querySelector('.tab'));
+  editingId = id;
+
+  // Switch to Add/Edit tab
+  const tabs=document.querySelectorAll('.tab');
+  tabs.forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  // Find add tab
+  for(const t of tabs){ if(t.textContent.includes('Add')||t.textContent.includes('➕')){ t.classList.add('active'); break; } }
+  const addPane=document.getElementById('pane-add'); if(addPane) addPane.classList.add('active');
+
   setTimeout(()=>{
-    // Fill item ID and name so user knows which item
-    const fi=document.getElementById('f-id'); if(fi){fi.value=p.id;fi.readOnly=true;fi.style.opacity='.6';}
-    const fn=document.getElementById('f-name'); if(fn) fn.value=p.name;
-    const fb=document.getElementById('f-batch'); if(fb) fb.value=p.batch||'';
-    // Load existing photos
-    curPhotos=p.photos&&p.photos.length>0?[...p.photos]:(p.img?[p.img]:[]);
+    // Show edit banner
+    document.getElementById('form-title').textContent='✏️ Edit Item';
+    document.getElementById('edit-mode-banner').style.display='block';
+    document.getElementById('edit-item-label').textContent=p.name+' (#'+p.id+')';
+    document.getElementById('cancel-edit-btn').style.display='inline-flex';
+
+    // Populate all fields
+    const set=(id,val)=>{ const el=document.getElementById(id); if(el){ el.value=val; el.readOnly=(id==='f-id'); if(id==='f-id') el.style.opacity='.6'; } };
+    set('f-id',    p.id);
+    set('f-name',  p.name||'');
+    set('f-batch', p.batch||'');
+    set('f-cost',  p.cost||'');
+    set('f-retail',p.retail||'');
+    set('f-qty',   p.qty||1);
+    set('f-notes', p.notes||'');
+
+    // Category
+    const catEl=document.getElementById('f-cat');
+    if(catEl) catEl.value=p.cat||'Saree';
+
+    // Photos
+    curPhotos=p.photos&&p.photos.length>0?[...p.photos.filter(u=>u&&!u.startsWith('data:'))]:(p.img&&!p.img.startsWith('data:')?[p.img]:[]);
     curImg=curPhotos[0]||'';
     renderPhotoSlots();
-    // Change save button to update
+    calcMargin();
+
+    // Change save button
     const saveBtn=document.querySelector('.btn-row .btn-gold');
-    if(saveBtn){
-      saveBtn.textContent='Update Photos';
-      saveBtn.onclick=()=>{
-        p.photos=curPhotos.filter(u=>u&&!u.startsWith('data:'));
-        p.img=p.photos[0]||'';
-        save(); saveToSheet(p);
-        alert('✅ Photos updated for '+p.name);
-        // Reset
-        saveBtn.textContent='Save Item';
-        saveBtn.onclick=addProduct;
-        const fi2=document.getElementById('f-id'); if(fi2){fi2.readOnly=false;fi2.style.opacity='';}
-        clearForm();
-        switchTab('inventory', document.querySelectorAll('.tab')[2]);
-      };
-    }
-  }, 100);
+    if(saveBtn){ saveBtn.textContent='✅ Update Item'; saveBtn.onclick=updateItem; }
+  }, 80);
+}
+
+function updateItem(){
+  if(!editingId) return;
+  const p=products.find(x=>x.id===editingId); if(!p) return;
+
+  const name=document.getElementById('f-name').value.trim();
+  if(!name){alert('Item name is required.');return;}
+
+  // Update all fields
+  p.name   = name;
+  p.batch  = document.getElementById('f-batch').value.trim()||p.batch||'';
+  p.cat    = document.getElementById('f-cat').value;
+  p.cost   = parseFloat(document.getElementById('f-cost').value)||p.cost||0;
+  p.retail = parseFloat(document.getElementById('f-retail').value)||p.retail||0;
+  p.qty    = parseInt(document.getElementById('f-qty').value)||1;
+  p.notes  = document.getElementById('f-notes').value.trim();
+  p.photos = curPhotos.filter(u=>u&&!u.startsWith('data:'));
+  p.img    = p.photos[0]||p.img||'';
+
+  save();
+  saveToSheet(p);
+  renderAll();
+  alert('✅ "'+p.name+'" updated successfully!');
+  cancelEdit();
+  // Go back to inventory
+  const tabs=document.querySelectorAll('.tab');
+  for(const t of tabs){ if(t.textContent.includes('Inventory')||t.textContent.includes('📦')){ t.click(); break; } }
+}
+
+function cancelEdit(){
+  editingId=null;
+  document.getElementById('form-title').textContent='➕ Add New Item';
+  document.getElementById('edit-mode-banner').style.display='none';
+  document.getElementById('cancel-edit-btn').style.display='none';
+  const saveBtn=document.querySelector('.btn-row .btn-gold');
+  if(saveBtn){ saveBtn.textContent='Save Item'; saveBtn.onclick=addProduct; }
+  const fi=document.getElementById('f-id'); if(fi){fi.readOnly=false;fi.style.opacity='';}
+  clearForm();
 }
 
 </script>
