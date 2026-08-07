@@ -397,8 +397,8 @@ function doLogin(){
 }
 function doLogout(){ sessionStorage.removeItem('auth'); location.reload(); }
 window.addEventListener('load',()=>{
-  // Auto-sync from sheet on load
-  setTimeout(loadFromSheetAPI, 1500);
+  // Auto-load from sheet on login
+  setTimeout(()=>{ if(API_URL) loadFromSheetAPI(); }, 1500);
   if(sessionStorage.getItem('auth')==='1'){ document.getElementById('login-screen').style.display='none'; document.getElementById('app').style.display='block'; renderAll(); }
   document.getElementById('pwd-input').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
 });
@@ -568,22 +568,35 @@ function save(){
   localStorage.setItem('clothing_sales',JSON.stringify(sales));
 }
 
+// ── GOOGLE SHEET API HELPERS ──
+// Apps Script requires Content-Type text/plain for POST body reads
+function sheetPost(payload){
+  if(!API_URL) return;
+  return fetch(API_URL, {
+    method:'POST',
+    headers:{'Content-Type':'text/plain'},
+    body: JSON.stringify(payload),
+    redirect:'follow'
+  });
+}
+
+function sheetGet(action){
+  if(!API_URL) return Promise.resolve(null);
+  return fetch(API_URL+'?action='+action+'&t='+Date.now(), {
+    redirect:'follow'
+  });
+}
+
 // Save a single product to Google Sheet
 function saveToSheet(product){
   if(!API_URL) return;
-  fetch(API_URL, {
-    method:'POST',
-    body: JSON.stringify({ action:'write', product: product })
-  }).catch(()=>{}); // silent fail — localStorage is the backup
+  sheetPost({action:'write', product:product}).catch(()=>{});
 }
 
 // Delete a product from Google Sheet
 function deleteFromSheet(id){
   if(!API_URL) return;
-  fetch(API_URL, {
-    method:'POST',
-    body: JSON.stringify({ action:'delete', id: id })
-  }).catch(()=>{});
+  sheetPost({action:'delete', id:id}).catch(()=>{});
 }
 
 // Sync ALL localStorage products to Sheet (run once to migrate existing data)
@@ -592,10 +605,7 @@ async function syncAllToSheet(){
   const btn = document.getElementById('sync-btn');
   if(btn) btn.textContent = 'Syncing...';
   try {
-    const res = await fetch(API_URL, {
-      method:'POST',
-      body: JSON.stringify({ action:'sync', products: products })
-    });
+    const res = await sheetPost({ action:'sync', products: products });
     const data = await res.json();
     if(data.success){
       alert('✅ Synced ' + data.synced + ' products to Google Sheet!');
@@ -614,7 +624,7 @@ async function loadFromSheetAPI(){
   const btn = document.getElementById('load-sheet-btn');
   if(btn){ btn.textContent = 'Loading...'; btn.disabled = true; }
   try {
-    const res = await fetch(API_URL + '?action=read');
+    const res = await sheetGet('read');
     const data = await res.json();
     if(data.success && data.data.length > 0){
       // Map sheet columns to product objects
