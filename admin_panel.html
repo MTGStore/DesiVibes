@@ -364,14 +364,13 @@ tr:hover td{background:rgba(201,151,58,.03)}
 </div>
 
 <script>
-// Password: Gsp4046689091$ — stored as SHA-256 hash only
-const PWD_HASH='5858c36af834ccf98646267bec656e4b8b6788c880640ec6ed9d6bb6c2042022';
+// Password obfuscated — works on HTTP and HTTPS
+const _k = atob(atob('UjNOd05EQTBOalk0T1RBNU1TUT0='));
 const OWNER='Tupi Desai';
 
-async function hashStr(s){ const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)); return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
-async function doLogin(){
+function doLogin(){
   const v=document.getElementById('pwd-input').value;
-  if(await hashStr(v)===PWD_HASH){ sessionStorage.setItem('auth','1'); document.getElementById('login-screen').style.display='none'; document.getElementById('app').style.display='block'; renderAll(); }
+  if(v===_k){ sessionStorage.setItem('auth','1'); document.getElementById('login-screen').style.display='none'; document.getElementById('app').style.display='block'; renderAll(); }
   else{ document.getElementById('login-err').style.display='block'; document.getElementById('pwd-input').value=''; setTimeout(()=>document.getElementById('login-err').style.display='none',3000); }
 }
 function doLogout(){ sessionStorage.removeItem('auth'); location.reload(); }
@@ -463,7 +462,7 @@ function renderInventory(){
       <td><span style="font-size:.68rem;background:rgba(0,137,123,.12);color:var(--teal);padding:2px 6px;border-radius:8px;border:1px solid rgba(0,137,123,.2)">${p.cat}</span></td>
       <td>$${p.cost.toFixed(2)}</td><td style="color:var(--gold);font-weight:600">$${p.retail.toFixed(2)}</td>
       <td style="color:#66bb6a;font-weight:600">$${profit}</td>
-      <td style="color:${margin>=50?'#66bb6a':margin>=30?'#fb8c00':'var(--magenta)';font-weight:600}">${margin}%</td>
+      <td style="color:${margin>=50?'#66bb6a':margin>=30?'#fb8c00':'#c2185b'};font-weight:600">${margin}%</td>
       <td><span class="badge badge-${isSold?'sold':'active'}">${isSold?'Sold Out':'Active'}</span></td>
       <td>${!isSold?`<button class="act-btn act-sell" onclick="markSold('${p.id}')">Sold</button>`:''}${isSold?`<button class="act-btn act-relist" onclick="relistItem('${p.id}')">Relist</button>`:''}
       <button class="act-btn act-del" onclick="deleteProduct('${p.id}')">Del</button></td></tr>`;
