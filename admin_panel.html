@@ -176,11 +176,13 @@ tr:hover td{background:rgba(201,151,58,.03)}
     <button class="logout-btn" onclick="doLogout()">Sign Out</button>
   </header>
 
-  <div style="padding:.75rem 1rem 0;max-width:1100px;margin:0 auto">
-    <div class="sheet-config">
-      <span class="sheet-lbl">📊 Google Sheet:</span>
-      <input type="text" id="sheet-url" placeholder="Paste published CSV URL...">
-      <button class="btn btn-gold" onclick="loadFromSheet()">Sync</button>
+  <div style="padding:.65rem 1rem 0;max-width:1100px;margin:0 auto">
+    <div style="background:rgba(46,125,50,.1);border:1px solid rgba(46,125,50,.25);border-radius:var(--radius);padding:.65rem 1rem;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+      <span style="font-size:.75rem;color:#66bb6a;font-weight:600">✅ Google Sheet Connected — Data saves automatically</span>
+      <div style="display:flex;gap:.5rem;margin-left:auto;flex-wrap:wrap">
+        <button class="btn btn-gold" id="sync-btn" onclick="syncAllToSheet()" style="font-size:.75rem;padding:.38rem .85rem">⬆ Sync All to Sheet</button>
+        <button class="btn btn-outline" id="load-sheet-btn" onclick="loadFromSheetAPI()" style="font-size:.75rem;padding:.38rem .85rem">⬇ Load from Sheet</button>
+      </div>
     </div>
   </div>
 
@@ -189,6 +191,7 @@ tr:hover td{background:rgba(201,151,58,.03)}
     <div class="tab" onclick="switchTab('add',this)">➕ Add Item</div>
     <div class="tab" onclick="switchTab('inventory',this)">📦 Inventory</div>
     <div class="tab" onclick="switchTab('sales',this)">💰 Sales</div>
+    <div class="tab" onclick="switchTab('reports',this)">📋 Reports</div>
     <div class="tab" onclick="switchTab('share',this)">📲 Share</div>
   </div>
 
@@ -197,16 +200,34 @@ tr:hover td{background:rgba(201,151,58,.03)}
     <!-- DASHBOARD -->
     <div id="pane-dashboard" class="pane active">
       <div class="stats">
-        <div class="stat"><div class="stat-val" id="s-total">0</div><div class="stat-lbl">Total</div></div>
-        <div class="stat"><div class="stat-val" id="s-active">0</div><div class="stat-lbl">Active</div></div>
-        <div class="stat"><div class="stat-val" id="s-sold" style="color:var(--saffron)">0</div><div class="stat-lbl">Sold Out</div></div>
-        <div class="stat"><div class="stat-val" id="s-invest" style="font-size:1.05rem">$0</div><div class="stat-lbl">Cost</div></div>
-        <div class="stat"><div class="stat-val" id="s-retail" style="font-size:1.05rem;color:#64b5f6">$0</div><div class="stat-lbl">Retail</div></div>
-        <div class="stat"><div class="stat-val" id="s-profit" style="font-size:1.05rem;color:#66bb6a">$0</div><div class="stat-lbl">Profit</div></div>
+        <div class="stat"><div class="stat-val" id="s-total">0</div><div class="stat-lbl">Total Items</div></div>
+        <div class="stat"><div class="stat-val" id="s-active" style="color:#66bb6a">0</div><div class="stat-lbl">Available</div></div>
+        <div class="stat"><div class="stat-val" id="s-pending" style="color:#fb8c00">0</div><div class="stat-lbl">Pending</div></div>
+        <div class="stat"><div class="stat-val" id="s-sold" style="color:var(--magenta)">0</div><div class="stat-lbl">Sold</div></div>
+        <div class="stat"><div class="stat-val" id="s-invest" style="font-size:1rem">$0</div><div class="stat-lbl">Total Cost</div></div>
+        <div class="stat"><div class="stat-val" id="s-unsold-val" style="font-size:1rem;color:#64b5f6">$0</div><div class="stat-lbl">Unsold Value</div></div>
       </div>
       <div class="section">
         <div class="sec-head"><h2>Recent Items</h2></div>
         <div class="sec-body"><div id="recent-list" style="color:var(--muted);text-align:center;padding:2rem;font-size:.82rem">No products yet.</div></div>
+      </div>
+    </div>
+
+
+    <!-- REPORTS -->
+    <div id="pane-reports" class="pane">
+      <div class="section">
+        <div class="sec-head"><h2>📋 Batch Reports</h2></div>
+        <div class="sec-body">
+          <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:1.25rem">
+            <select id="report-batch" style="flex:1;min-width:160px;padding:.52rem .75rem;background:var(--card2);border:1.5px solid var(--gold-border);border-radius:var(--radius);font-size:.82rem;color:var(--offwhite);outline:none">
+              <option value="">-- Select Batch --</option>
+            </select>
+            <button class="btn btn-gold" onclick="generateReport()">Generate Report</button>
+            <button class="btn btn-outline" onclick="exportBatchCSV()">Export CSV</button>
+          </div>
+          <div id="report-output" style="color:var(--muted);text-align:center;padding:2.5rem;font-size:.85rem">Select a batch and click Generate Report</div>
+        </div>
       </div>
     </div>
 
@@ -216,6 +237,7 @@ tr:hover td{background:rgba(201,151,58,.03)}
         <div class="sec-head"><h2>➕ Add New Item</h2></div>
         <div class="sec-body">
           <div class="form-grid">
+            <div class="fg"><label>Batch # *</label><input type="text" id="f-batch" placeholder="e.g. Batch 1, Aug 2026" style="border-color:rgba(201,151,58,.5)"></div>
             <div class="fg"><label>Item Number *</label><input type="text" id="f-id" placeholder="e.g. 12345"></div>
             <div class="fg"><label>Item Name *</label><input type="text" id="f-name" placeholder="e.g. Red Banarasi Saree"></div>
             <div class="fg"><label>Category</label>
@@ -288,15 +310,14 @@ tr:hover td{background:rgba(201,151,58,.03)}
             </select>
             <select id="filter-status" onchange="renderInventory()">
               <option value="">All Status</option>
-              <option>Active</option><option>Sold</option>
+              <option>Active</option><option>Pending</option><option>Sold</option>
             </select>
           </div>
           <div class="tbl-wrap">
             <table>
               <thead><tr>
-                <th>Photo</th><th>Item #</th><th>Name</th><th>Cat</th>
-                <th>Cost</th><th>Retail</th><th>Profit</th><th>Margin</th>
-                <th>Status</th><th>Actions</th>
+                <th>Photo</th><th>Batch</th><th>Item #</th><th>Name</th><th>Cat</th>
+                <th>Cost</th><th>Retail</th><th>Status</th><th>Actions</th>
               </tr></thead>
               <tbody id="inv-body"></tbody>
             </table>
@@ -376,6 +397,8 @@ function doLogin(){
 }
 function doLogout(){ sessionStorage.removeItem('auth'); location.reload(); }
 window.addEventListener('load',()=>{
+  // Auto-sync from sheet on load
+  setTimeout(loadFromSheetAPI, 1500);
   if(sessionStorage.getItem('auth')==='1'){ document.getElementById('login-screen').style.display='none'; document.getElementById('app').style.display='block'; renderAll(); }
   document.getElementById('pwd-input').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
 });
@@ -395,16 +418,7 @@ function removeImg(){ curImg=''; document.getElementById('img-preview').src=''; 
 
 function switchTab(n,el){ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active')); el.classList.add('active'); document.getElementById('pane-'+n).classList.add('active'); if(n==='inventory') renderInventory(); if(n==='sales') renderSales(); if(n==='share') buildWASelect(); }
 
-function loadFromSheet(){
-  const url=document.getElementById('sheet-url').value.trim(); if(!url){alert('Paste your Google Sheet CSV URL first.');return;}
-  fetch(url).then(r=>r.text()).then(csv=>{
-    const rows=csv.trim().split('\n').slice(1); let n=0;
-    rows.forEach(row=>{ const c=row.split(',').map(x=>x.replace(/^"|"$/g,'').trim()); if(!c[0]) return;
-      const p={id:c[0],name:c[1],cat:c[2]||'Other',cost:parseFloat(c[3])||0,retail:parseFloat(c[4])||0,img:c[5]||'',qty:parseInt(c[6])||1,status:c[7]||'Active',notes:c[8]||'',added:new Date().toISOString()};
-      if(!products.find(x=>x.id===p.id)){products.push(p);n++;} });
-    save(); renderAll(); alert('Imported '+n+' new items!');
-  }).catch(()=>alert('Could not load. Check URL and make sure sheet is published as CSV.'));
-}
+// Google Sheet now uses API — see loadFromSheetAPI()
 
 function calcMargin(){
   const cost=parseFloat(document.getElementById('f-cost').value)||0, retail=parseFloat(document.getElementById('f-retail').value)||0;
@@ -453,6 +467,14 @@ function renderInventory(){
   const search=(document.getElementById('search')||{value:''}).value.toLowerCase();
   const cat=(document.getElementById('filter-cat')||{value:''}).value;
   const status=(document.getElementById('filter-status')||{value:''}).value;
+  const batchF=(document.getElementById('filter-batch')||{value:''}).value;
+
+  // Populate batch dropdown
+  const batches=[...new Set(products.map(p=>p.batch||'').filter(Boolean))].sort();
+  const bSel=document.getElementById('filter-batch');
+  if(bSel){ const cur=bSel.value; bSel.innerHTML='<option value="">All Batches</option>'+batches.map(b=>`<option value="${b}"${b===cur?' selected':''}>${b}</option>`).join(''); }
+  const rBatch=document.getElementById('report-batch');
+  if(rBatch){ const rc=rBatch.value; rBatch.innerHTML='<option value="">-- Select Batch --</option>'+batches.map(b=>`<option value="${b}"${b===rc?' selected':''}>${b}</option>`).join(''); }
   let list=products.filter(p=>{
     if(search&&!p.name.toLowerCase().includes(search)&&!p.id.toLowerCase().includes(search)&&!String(p.retail).includes(search)) return false;
     if(cat&&p.cat!==cat) return false; if(status&&p.status!==status) return false; return true;
@@ -460,19 +482,24 @@ function renderInventory(){
   const body=document.getElementById('inv-body');
   if(!list.length){body.innerHTML='<tr><td colspan="10" style="text-align:center;color:#555;padding:2rem">No items found</td></tr>';return;}
   body.innerHTML=list.map(p=>{
-    const profit=(p.retail-p.cost).toFixed(2), margin=(p.retail>0?(p.retail-p.cost)/p.retail*100:0).toFixed(1);
-    const imgHtml=p.img?`<img src="${p.img}" class="img-thumb" onerror="this.outerHTML='<div class=img-ph>👗</div>'">`:`<div class="img-ph">👗</div>`;
     const isSold=p.status==='Sold';
-    return `<tr><td>${imgHtml}</td><td style="color:var(--gold);font-weight:600">${p.id}</td>
-      <td>${p.name}${p.notes?`<br><span style="font-size:.65rem;color:#555">${p.notes.substring(0,40)}${p.notes.length>40?'…':''}</span>`:''}</td>
-      <td><span style="font-size:.68rem;background:rgba(0,137,123,.12);color:var(--teal);padding:2px 6px;border-radius:8px;border:1px solid rgba(0,137,123,.2)">${p.cat}</span></td>
-      <td>$${p.cost.toFixed(2)}</td><td style="color:var(--gold);font-weight:600">$${p.retail.toFixed(2)}</td>
-      <td style="color:#66bb6a;font-weight:600">$${profit}</td>
-      <td style="color:${margin>=50?'#66bb6a':margin>=30?'#fb8c00':'#c2185b'};font-weight:600">${margin}%</td>
-      <td><span class="badge badge-${isSold?'sold':'active'}">${isSold?'Sold Out':'Active'}</span></td>
-      <td>${!isSold?`<button class="act-btn act-sell" onclick="markSold('${p.id}')">Sold</button>`:''}${isSold?`<button class="act-btn act-relist" onclick="relistItem('${p.id}')">Relist</button>`:''}
-      <button class="act-btn act-del" onclick="deleteProduct('${p.id}')">Del</button></td></tr>`;
-  }).join('');
+    const isPending=p.status==='Pending';
+    const isActive=p.status==='Active';
+    const imgHtml=p.img?`<img src="${p.img}" style="width:36px;height:45px;object-fit:cover;border-radius:2px;border:1px solid var(--border)">`:'<div style="width:36px;height:45px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:.9rem">👗</div>';
+    const statusBadge=isSold?'<span class="badge badge-sold">Sold</span>':isPending?'<span class="badge" style="background:rgba(251,140,0,.15);color:#fb8c00;border-color:#fb8c00">Pending</span>':'<span class="badge badge-active">Active</span>';
+    return `<tr><td>${imgHtml}</td>
+      <td style="font-size:.72rem;color:var(--gold-dim)">${p.batch||'—'}</td>
+      <td style="color:var(--gold);font-weight:600">${p.id}</td>
+      <td>${p.name}</td><td>${p.cat}</td>
+      <td>$${p.cost.toFixed(2)}</td>
+      <td style="color:var(--gold);font-weight:600">$${p.retail.toFixed(2)}</td>
+      <td>${statusBadge}</td>
+      <td style="display:flex;gap:.3rem;flex-wrap:wrap">
+        ${isActive?`<button class="act-btn act-sell" onclick="markSold('${p.id}')">Sold</button>`:''}
+        ${isActive?`<button class="act-btn" style="background:rgba(251,140,0,.12);color:#fb8c00;border-color:#fb8c00;font-size:.7rem" onclick="markPending('${p.id}')">Pending</button>`:''}
+        ${(isSold||isPending)?`<button class="act-btn act-relist" onclick="relistItem('${p.id}')">Relist</button>`:''}
+        <button class="act-btn" style="background:rgba(21,101,192,.12);color:#64b5f6;border-color:#1565c0" onclick="deleteProduct('${p.id}')">Del</button>
+      </td></tr>`;  }).join('');
 }
 
 function renderSales(){
@@ -488,14 +515,18 @@ function renderSales(){
 }
 
 function renderDashboard(){
-  const active=products.filter(p=>p.status==='Active'), sold=products.filter(p=>p.status==='Sold');
-  const invest=active.reduce((a,p)=>a+p.cost*p.qty,0), retail=active.reduce((a,p)=>a+p.retail*p.qty,0);
-  document.getElementById('s-total').textContent=products.length;
-  document.getElementById('s-active').textContent=active.length;
-  document.getElementById('s-sold').textContent=sold.length;
-  document.getElementById('s-invest').textContent='$'+invest.toFixed(0);
-  document.getElementById('s-retail').textContent='$'+retail.toFixed(0);
-  document.getElementById('s-profit').textContent='$'+(retail-invest).toFixed(0);
+  const active=products.filter(p=>p.status==='Active');
+  const pending=products.filter(p=>p.status==='Pending');
+  const sold=products.filter(p=>p.status==='Sold');
+  const totalCost=products.reduce((a,p)=>a+p.cost,0);
+  const unsoldVal=[...active,...pending].reduce((a,p)=>a+p.retail,0);
+  const set=(id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=val; };
+  set('s-total', products.length);
+  set('s-active', active.length);
+  set('s-pending', pending.length);
+  set('s-sold', sold.length);
+  set('s-invest', '$'+totalCost.toFixed(0));
+  set('s-unsold-val', '$'+unsoldVal.toFixed(0));
   const el=document.getElementById('recent-list');
   if(!products.length){el.innerHTML='<div style="text-align:center;color:#555;padding:2rem">No products yet.</div>';return;}
   el.innerHTML=[...products].reverse().slice(0,6).map(p=>{
@@ -612,6 +643,85 @@ async function loadFromSheetAPI(){
   if(btn){ btn.textContent = 'Load from Sheet'; btn.disabled = false; }
 }
 function renderAll(){ renderDashboard(); renderInventory(); renderSales(); }
+
+// ── BATCH REPORTS ──
+function generateReport(){
+  const batch=document.getElementById('report-batch').value;
+  if(!batch){alert('Please select a batch first.');return;}
+  const bItems=products.filter(p=>(p.batch||'')=== batch);
+  if(!bItems.length){document.getElementById('report-output').innerHTML='<div style="color:var(--muted);padding:2rem;text-align:center">No items found in this batch.</div>';return;}
+  const total=bItems.length;
+  const sold=bItems.filter(p=>p.status==='Sold');
+  const pending=bItems.filter(p=>p.status==='Pending');
+  const active=bItems.filter(p=>p.status==='Active');
+  const totalCost=bItems.reduce((a,p)=>a+p.cost,0);
+  const totalRetail=bItems.reduce((a,p)=>a+p.retail,0);
+  const soldRevenue=sold.reduce((a,p)=>a+p.retail,0);
+  const soldCost=sold.reduce((a,p)=>a+p.cost,0);
+  const profit=soldRevenue-soldCost;
+  const unsoldRetail=[...active,...pending].reduce((a,p)=>a+p.retail,0);
+  const margin=soldRevenue>0?((profit/soldRevenue)*100).toFixed(1):0;
+  document.getElementById('report-output').innerHTML=`
+    <div style="max-width:600px;margin:0 auto">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;color:var(--gold);margin-bottom:1rem;text-align:center">${batch} — Summary Report</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.25rem">
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:.75rem;text-align:center">
+          <div style="font-size:1.6rem;font-weight:700;color:var(--offwhite)">${total}</div><div style="font-size:.7rem;color:var(--muted)">Total Items</div>
+        </div>
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:.75rem;text-align:center">
+          <div style="font-size:1.6rem;font-weight:700;color:#66bb6a">${active.length}</div><div style="font-size:.7rem;color:var(--muted)">Available</div>
+        </div>
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:.75rem;text-align:center">
+          <div style="font-size:1.6rem;font-weight:700;color:var(--magenta)">${sold.length}</div><div style="font-size:.7rem;color:var(--muted)">Sold</div>
+        </div>
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:.75rem;text-align:center">
+          <div style="font-size:1.6rem;font-weight:700;color:#fb8c00">${pending.length}</div><div style="font-size:.7rem;color:var(--muted)">Pending</div>
+        </div>
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:.75rem;text-align:center">
+          <div style="font-size:1.1rem;font-weight:700;color:#66bb6a">$${profit.toFixed(2)}</div><div style="font-size:.7rem;color:var(--muted)">Profit Earned</div>
+        </div>
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:.75rem;text-align:center">
+          <div style="font-size:1.1rem;font-weight:700;color:#64b5f6">$${unsoldRetail.toFixed(2)}</div><div style="font-size:.7rem;color:var(--muted)">Unsold Value</div>
+        </div>
+      </div>
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:.85rem;margin-bottom:1rem">
+        <div style="font-size:.72rem;color:var(--muted);margin-bottom:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em">Financials</div>
+        <div style="display:flex;justify-content:space-between;font-size:.82rem;padding:.35rem 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Total Cost (batch)</span><span>$${totalCost.toFixed(2)}</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:.82rem;padding:.35rem 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Total Retail Value</span><span style="color:var(--gold)">$${totalRetail.toFixed(2)}</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:.82rem;padding:.35rem 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Revenue from Sales</span><span style="color:#64b5f6">$${soldRevenue.toFixed(2)}</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:.82rem;padding:.35rem 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Cost of Sold Items</span><span>$${soldCost.toFixed(2)}</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:.88rem;font-weight:700;padding:.4rem 0"><span style="color:var(--muted)">Net Profit</span><span style="color:#66bb6a">$${profit.toFixed(2)} (${margin}% margin)</span></div>
+      </div>
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:6px;overflow:hidden">
+        <div style="padding:.65rem .85rem;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)">Items in ${batch}</div>
+        ${bItems.map(p=>`
+          <div style="display:flex;align-items:center;gap:.65rem;padding:.55rem .85rem;border-bottom:1px solid rgba(201,151,58,.06)">
+            ${p.img?`<img src="${p.img}" style="width:32px;height:40px;object-fit:cover;border-radius:2px;flex-shrink:0">`:'<div style="width:32px;height:40px;background:#14100a;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.8rem">👗</div>'}
+            <div style="flex:1;min-width:0">
+              <div style="font-size:.8rem;font-weight:600;color:var(--offwhite);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
+              <div style="font-size:.68rem;color:var(--muted)">Item #${p.id} · ${p.cat}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-size:.82rem;font-weight:700;color:var(--gold)">$${p.retail.toFixed(2)}</div>
+              <div style="font-size:.68rem;color:${p.status==='Sold'?'var(--magenta)':p.status==='Pending'?'#fb8c00':'#66bb6a'}">${p.status}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function exportBatchCSV(){
+  const batch=document.getElementById('report-batch').value;
+  const bItems=batch?products.filter(p=>(p.batch||'')===batch):products;
+  const rows=[['Batch','Item_ID','Item_Name','Category','Cost','Retail','Status','Notes']];
+  bItems.forEach(p=>rows.push([p.batch||'',p.id,'"'+p.name+'"',p.cat,p.cost,p.retail,p.status,'"'+(p.notes||'')+'"']));
+  const csv=rows.map(r=>r.join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download=(batch||'All_Batches')+'_Report.csv';
+  a.click();
+}
+
 </script>
 </body>
 </html>
