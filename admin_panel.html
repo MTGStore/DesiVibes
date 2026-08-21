@@ -543,7 +543,7 @@ function addProduct(){
   saveToSheet(newP);
   renderAll(); clearForm(); alert('✅ "'+name+'" added to Desi Vibes!');
 }
-function clearForm(){ ['f-id','f-name','f-batch','f-cost','f-retail','f-notes','f-img-url'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; }); const qel=document.getElementById('f-qty'); if(qel) qel.value='1'; curPhotos=[]; curImg=''; renderPhotoSlots(); const iz=document.getElementById('img-zone-icon'); const it=document.getElementById('img-zone-txt'); if(iz) iz.textContent='📷'; if(it) it.textContent='Tap to add photo'; calcMargin(); }
+function clearForm(){ ['f-id','f-name','f-batch','f-cost','f-retail','f-notes','f-img-url','f-video'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; }); const qel=document.getElementById('f-qty'); if(qel) qel.value='1'; curPhotos=[]; curImg=''; renderPhotoSlots(); const iz=document.getElementById('img-zone-icon'); const it=document.getElementById('img-zone-txt'); if(iz) iz.textContent='📷'; if(it) it.textContent='Tap to add photo'; calcMargin(); }
 
 function markSold(id){
   const p=products.find(x=>x.id===id); if(!p) return;
@@ -694,6 +694,7 @@ function saveToSheet(product){
   const p={...product};
   if(p.img && p.img.startsWith('data:')) p.img='';
   if(p.photos) p.photos=p.photos.filter(u=>u&&!u.startsWith('data:'));
+  if(p.video===undefined) p.video='';
   sheetPost({action:'write', product:p}).catch(()=>{});
 }
 
@@ -873,6 +874,7 @@ function editItem(id){
     set('f-retail',p.retail||'');
     set('f-qty',   p.qty||1);
     set('f-notes', p.notes||'');
+    set('f-video', p.video||'');
 
     // Category
     const catEl=document.getElementById('f-cat');
@@ -905,6 +907,7 @@ function updateItem(){
   p.retail = parseFloat(document.getElementById('f-retail').value)||p.retail||0;
   p.qty    = parseInt(document.getElementById('f-qty').value)||1;
   p.notes  = document.getElementById('f-notes').value.trim();
+  p.video  = (document.getElementById('f-video')||{value:''}).value.trim();
   p.photos = curPhotos.filter(u=>u&&!u.startsWith('data:'));
   p.img    = p.photos[0]||p.img||'';
 
