@@ -18,7 +18,7 @@
   --text:#f0ebe0;--muted:#666;--red:#e53935;
 }
 html,body{height:100%;background:var(--black);color:var(--text);font-family:'Inter',sans-serif;overflow-x:hidden}
-body{display:flex;flex-direction:column;min-height:100vh}
+body{min-height:100vh}
 
 /* ── TOP BAR ── */
 .topbar{
@@ -33,7 +33,7 @@ body{display:flex;flex-direction:column;min-height:100vh}
 
 /* ── LOGIN ── */
 #login{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 60px);
   padding:2rem 1.5rem;text-align:center;gap:1.25rem;
 }
 .login-logo{height:80px;width:auto;object-fit:contain;margin-bottom:.5rem}
@@ -59,7 +59,7 @@ body{display:flex;flex-direction:column;min-height:100vh}
 .numkey.zero{grid-column:2}
 
 /* ── MAIN APP ── */
-#app{display:none;flex:1;flex-direction:column}
+#app{display:none;flex-direction:column}
 
 /* ── PROGRESS BAR ── */
 .progress-wrap{padding:.6rem 1rem .3rem;background:var(--black)}
@@ -68,17 +68,14 @@ body{display:flex;flex-direction:column;min-height:100vh}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:2px;transition:width .35s ease}
 
 /* ── STEPS ── */
-.steps-wrap{flex:1;overflow:hidden;position:relative}
+.steps-wrap{overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:90px}
 .step{
-  position:absolute;inset:0;
-  padding:1.25rem 1.1rem;
-  display:flex;flex-direction:column;gap:1rem;
-  overflow-y:auto;-webkit-overflow-scrolling:touch;
-  opacity:0;pointer-events:none;transform:translateX(40px);
-  transition:opacity .3s,transform .3s;
+  display:none;
+  padding:1.25rem 1.1rem 1.5rem;
+  flex-direction:column;gap:1rem;
+  min-height:calc(100vh - 200px);
 }
-.step.active{opacity:1;pointer-events:auto;transform:translateX(0)}
-.step.exit-left{opacity:0;transform:translateX(-40px)}
+.step.active{display:flex}
 
 .step-icon{font-size:2.2rem;text-align:center;margin-bottom:.25rem}
 .step-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:var(--gold);text-align:center;line-height:1.2}
@@ -185,7 +182,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
   padding:.85rem 1rem;
   display:flex;gap:.65rem;
   background:var(--black);border-top:1px solid var(--border);
-  position:sticky;bottom:0;
+  position:fixed;bottom:0;left:0;right:0;z-index:40;
   padding-bottom:max(.85rem, env(safe-area-inset-bottom));
 }
 .btn-back{
@@ -213,7 +210,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 .btn-save:active{transform:scale(.98)}
 
 /* ── SUCCESS SCREEN ── */
-#success{display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;text-align:center;gap:1.1rem}
+#success{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 60px);padding:2rem 1.5rem;text-align:center;gap:1.1rem}
 .success-icon{font-size:4rem;animation:pop .4s cubic-bezier(.34,1.56,.64,1)}
 @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
 .success-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:var(--gold);font-weight:700}
@@ -346,12 +343,28 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
     <div class="step" id="step-3">
       <div class="step-icon">📸</div>
       <div class="step-title">Product Photos</div>
-      <div class="step-sub">Add up to 5 photos. First photo is the main one shown to customers.</div>
+      <div class="step-sub">Add up to 5 photos. First photo is the main one customers see.</div>
 
-      <div class="photo-grid" id="photo-grid"></div>
-      <div class="upload-status" id="upload-status"></div>
+      <!-- BIG CAMERA BUTTON — always visible -->
+      <label for="photo-file-input" style="display:block;cursor:pointer">
+        <div style="background:rgba(201,151,58,.07);border:2.5px dashed rgba(201,151,58,.4);border-radius:16px;padding:2rem 1rem;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.6rem">
+          <div style="font-size:3rem">📷</div>
+          <div style="font-size:1rem;font-weight:700;color:var(--gold)">Tap to Add Photos</div>
+          <div style="font-size:.75rem;color:var(--muted)">Opens your camera or gallery · Up to 5 photos</div>
+        </div>
+      </label>
+      <input type="file" id="photo-file-input" accept="image/*" multiple
+        style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"
+        onchange="handlePhotoFiles(event)">
 
-      <input type="file" id="photo-file-input" accept="image/*" multiple onchange="handlePhotoFiles(event)">
+      <!-- Upload status -->
+      <div id="upload-status" style="display:none;padding:.6rem .85rem;border-radius:10px;font-size:.82rem;font-weight:600;align-items:center;gap:.5rem"></div>
+
+      <!-- Photo thumbnails -->
+      <div id="photo-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem"></div>
+
+      <!-- Photo count -->
+      <div id="photo-count" style="text-align:center;font-size:.75rem;color:var(--muted)"></div>
     </div>
 
     <!-- STEP 4: Video -->
@@ -443,6 +456,10 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 <div class="toast" id="toast"></div>
 
 <script>
+// ── STATE ──
+let photos = [];
+let videoUrl = '';
+
 // ── CONSTANTS ──
 const _k    = atob(atob('UjNOd05EQTBOalk0T1RBNU1TUT0='));
 const API_URL = 'https://script.google.com/macros/s/AKfycbzculngSTM7SLtazn_NekwhorIJwGrVLCBExkxYL7L30cIgRnhATlo8gi2dpS0IUkE4/exec';
@@ -463,7 +480,7 @@ function doLogin(){
   if(v === _k){
     sessionStorage.setItem('auth','1');
     document.getElementById('login').style.display='none';
-    document.getElementById('app').style.display='flex';
+    document.getElementById('app').style.display='block';
     loadConfig();
     renderPhotoGrid();
   } else {
@@ -483,8 +500,9 @@ function doLogin(){
 // Check existing session
 if(sessionStorage.getItem('auth')==='1'){
   document.getElementById('login').style.display='none';
-  document.getElementById('app').style.display='flex';
+  document.getElementById('app').style.display='block';
   loadConfig();
+  renderPhotoGrid();
 }
 
 // ── CONFIG: load ImgBB key from sheet ──
@@ -508,14 +526,13 @@ const TOTAL_STEPS = 5;
 const STEP_NAMES = ['Item Details','Pricing','Photos','Video','Review'];
 
 function showStep(n){
-  document.querySelectorAll('.step').forEach(s=>{
-    s.classList.remove('active','exit-left');
-    if(n > currentStep) s.classList.add('exit-left');
-  });
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   const el=document.getElementById('step-'+n);
-  if(el) setTimeout(()=>el.classList.add('active'),10);
+  if(el) el.classList.add('active');
   currentStep=n;
   updateUI();
+  // Scroll to top
+  document.getElementById('steps-wrap').scrollTop=0;
   if(n===5) populateReview();
 }
 
@@ -572,23 +589,30 @@ function calcMargin(){
 }
 
 // ── PHOTOS ──
-let photos=[]; // array of URLs
-
 function renderPhotoGrid(){
   const grid=document.getElementById('photo-grid');
+  const count=document.getElementById('photo-count');
+  const label=document.querySelector('label[for="photo-file-input"]');
   if(!grid) return;
-  const slots=photos.map((url,i)=>`
-    <div class="photo-slot">
-      <img src="${url}" onerror="this.style.display='none'">
-      <button class="slot-rm" onclick="removePhoto(${i})">✕</button>
-      ${i===0?'<div class="main-badge">MAIN</div>':''}
+
+  // Show/hide the big camera button
+  if(label) label.style.display=photos.length>=5?'none':'block';
+
+  // Show thumbnails
+  if(photos.length===0){
+    grid.innerHTML='';
+    if(count) count.textContent='';
+    return;
+  }
+
+  grid.innerHTML=photos.map((url,i)=>`
+    <div style="position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;border:2px solid ${i===0?'var(--gold)':'rgba(201,151,58,.2)'}">
+      <img src="${url}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.opacity='.3'">
+      <button onclick="removePhoto(${i})" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.75);color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:.75rem;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+      ${i===0?'<div style="position:absolute;bottom:3px;left:3px;background:var(--gold);color:#000;font-size:.55rem;font-weight:700;padding:1px 5px;border-radius:3px">MAIN</div>':''}
     </div>`).join('');
-  const addBtn=photos.length<5?`
-    <div class="add-photo-btn" onclick="document.getElementById('photo-file-input').click()">
-      <div class="icon">📷</div>
-      <span>Add Photo</span>
-    </div>`:'';
-  grid.innerHTML=slots+addBtn;
+
+  if(count) count.textContent=photos.length+'/5 photo'+(photos.length!==1?'s':'')+' added'+(photos.length>=5?' (max reached)':'');
 }
 
 function removePhoto(idx){
@@ -604,8 +628,8 @@ async function handlePhotoFiles(e){
   if(!toUpload.length) return;
 
   const status=document.getElementById('upload-status');
-  status.className='upload-status uploading';
-  status.innerHTML='<span class="spin">⏳</span> Uploading '+toUpload.length+' photo'+(toUpload.length>1?'s':'')+'...';
+  status.style.cssText='display:flex;background:rgba(201,151,58,.08);color:var(--gold);border:1px solid var(--border);padding:.6rem .85rem;border-radius:10px;font-size:.82rem;font-weight:600;align-items:center;gap:.5rem';
+  status.innerHTML='<span class="spin" style="display:inline-block;animation:spin .8s linear infinite">⏳</span> Uploading '+toUpload.length+' photo'+(toUpload.length>1?'s':'')+'...';
 
   let uploaded=0,failed=0;
   for(const file of toUpload){
@@ -614,7 +638,7 @@ async function handlePhotoFiles(e){
       photos.push(url);
       uploaded++;
       renderPhotoGrid();
-      status.innerHTML='<span class="spin">⏳</span> Uploaded '+uploaded+'/'+toUpload.length+'...';
+      status.innerHTML='<span class="spin" style="display:inline-block;animation:spin .8s linear infinite">⏳</span> Uploaded '+uploaded+'/'+toUpload.length+'...';
     } catch(err){
       failed++;
     }
@@ -653,7 +677,6 @@ function fileToB64(file){
 }
 
 // ── VIDEO ──
-let videoUrl='';
 
 async function pasteVideo(){
   try{
@@ -763,7 +786,7 @@ function saveItem(){
 
   // Show success
   document.getElementById('app').style.display='none';
-  document.getElementById('success').style.display='flex';
+  document.getElementById('success').style.display='flex';document.getElementById('success').style.flexDirection='column';
   document.getElementById('success-msg').textContent=
     '"'+name+'" is now live on desivibes.org';
 }
@@ -789,7 +812,7 @@ function addAnother(){
   updateUI();
 
   document.getElementById('success').style.display='none';
-  document.getElementById('app').style.display='flex';
+  document.getElementById('app').style.display='block';
 }
 
 function showToast(msg){
