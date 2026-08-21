@@ -180,11 +180,12 @@ tr:hover td{background:rgba(201,151,58,.03)}
     <div style="background:rgba(46,125,50,.1);border:1px solid rgba(46,125,50,.25);border-radius:var(--radius);padding:.65rem 1rem;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
       <span style="font-size:.75rem;color:#66bb6a;font-weight:600">✅ Google Sheet Connected</span>
       <div style="display:flex;align-items:center;gap:.4rem;flex:1;min-width:0">
-        <span style="font-size:.68rem;color:var(--muted);flex-shrink:0">ImgBB Key:</span>
-        <input type="text" id="imgbb-key" placeholder="Paste your ImgBB API key"
-          style="flex:1;min-width:80px;max-width:200px;padding:.28rem .5rem;background:var(--card2);border:1px solid var(--border);border-radius:3px;font-size:.7rem;color:var(--offwhite);outline:none"
-          oninput="localStorage.setItem('imgbb_key',this.value)"
+        <span style="font-size:.68rem;color:var(--muted);flex-shrink:0" id="imgbb-lbl">🔑 ImgBB:</span>
+        <input type="password" id="imgbb-key" placeholder="Paste API key (hidden)"
+          style="flex:1;min-width:80px;max-width:180px;padding:.28rem .5rem;background:var(--card2);border:1px solid var(--border);border-radius:3px;font-size:.7rem;color:var(--offwhite);outline:none"
+          oninput="localStorage.setItem('imgbb_key',this.value);updateKeyStatus()"
           value="">
+        <span id="imgbb-status" style="font-size:.68rem;display:none"></span>
       </div>
       <div style="display:flex;gap:.5rem;flex-shrink:0">
         <button class="btn btn-gold" id="sync-btn" onclick="syncAllToSheet()" style="font-size:.75rem;padding:.38rem .85rem">⬆ Sync All</button>
@@ -285,9 +286,24 @@ tr:hover td{background:rgba(201,151,58,.03)}
               </div>
             </div>
             <div class="fg" style="grid-column:1/-1">
+              <label style="display:flex;align-items:center;gap:.5rem">
+                ▶ YouTube Video URL
+                <span style="font-size:.65rem;color:var(--muted);font-weight:400">(optional)</span>
+              </label>
+              <input type="url" id="f-video"
+                placeholder="https://youtube.com/watch?v=... or https://youtu.be/..."
+                style="border-color:rgba(37,211,102,.2)">
+              <div style="margin-top:.28rem;font-size:.68rem;color:var(--muted);line-height:1.5">
+                📱 Phone: Open YouTube → <strong style="color:#aaa">Share → Copy Link</strong> → paste here &nbsp;·&nbsp;
+                💻 Desktop: Copy URL from address bar
+              </div>
+            </div>
+
+            <div class="fg" style="grid-column:1/-1">
               <label>Description (shown to customers)</label>
               <textarea id="f-notes" placeholder="e.g. Pure silk, hand embroidered, free size fits S-XL. Color: Deep Red."></textarea>
             </div>
+
           </div>
 
           <div class="calc-box">
@@ -416,7 +432,7 @@ function doLogout(){ sessionStorage.removeItem('auth'); location.reload(); }
 window.addEventListener('load',()=>{
   // Load ImgBB key — from localStorage first, then from Google Sheet Config
   const savedKey=localStorage.getItem('imgbb_key');
-  if(savedKey){const kf=document.getElementById('imgbb-key');if(kf)kf.value=savedKey;}
+  if(savedKey){const kf=document.getElementById('imgbb-key');if(kf)kf.value=savedKey;updateKeyStatus();}
   // Fetch key from Google Sheet Config tab
   if(API_URL){
     fetch(API_URL+'?action=getConfig&t='+Date.now(),{redirect:'follow'})
@@ -425,6 +441,7 @@ window.addEventListener('load',()=>{
           localStorage.setItem('imgbb_key', d.imgbb_key);
           const kf=document.getElementById('imgbb-key');
           if(kf) kf.value=d.imgbb_key;
+          updateKeyStatus();
         }
       }).catch(()=>{});
   }
@@ -537,7 +554,21 @@ function addProduct(){
   const cost=parseFloat(document.getElementById('f-cost').value)||0, retail=parseFloat(document.getElementById('f-retail').value)||0;
   if(!id||!name||!cost||!retail){alert('Fill in: Item Number, Name, Cost, and Retail Price.');return;}
   if(products.find(p=>p.id===id)){alert('Item # '+id+' already exists.');return;}
-  const newP={id,name,cat:document.getElementById('f-cat').value,cost,retail,qty:parseInt(document.getElementById('f-qty').value)||1,img:curImg,notes:document.getElementById('f-notes').value.trim(),status:'Active',added:new Date().toISOString()};
+  const batch=(document.getElementById('f-batch')||{value:''}).value.trim()||'Batch 1';
+  const videoUrl=(document.getElementById('f-video')||{value:''}).value.trim();
+  const photos=curPhotos.length>0?[...curPhotos]:(curImg?[curImg]:[]);
+  const newP={
+    id, name, batch,
+    cat:document.getElementById('f-cat').value,
+    cost, retail,
+    qty:parseInt(document.getElementById('f-qty').value)||1,
+    img:photos[0]||curImg||'',
+    photos:photos,
+    video:videoUrl,
+    notes:document.getElementById('f-notes').value.trim(),
+    status:'Active',
+    added:new Date().toISOString()
+  };
   products.push(newP);
   save();
   saveToSheet(newP);
@@ -930,6 +961,21 @@ function cancelEdit(){
   if(saveBtn){ saveBtn.textContent='Save Item'; saveBtn.onclick=addProduct; }
   const fi=document.getElementById('f-id'); if(fi){fi.readOnly=false;fi.style.opacity='';}
   clearForm();
+}
+
+
+function updateKeyStatus(){
+  const key=localStorage.getItem('imgbb_key')||'';
+  const st=document.getElementById('imgbb-status');
+  const lbl=document.getElementById('imgbb-lbl');
+  const inp=document.getElementById('imgbb-key');
+  if(key){
+    if(st){st.textContent='✅ Key set';st.style.cssText='font-size:.68rem;color:#66bb6a;display:inline';st.style.display='inline';}
+    if(inp){inp.style.maxWidth='80px';inp.placeholder='••••••••';}
+  } else {
+    if(st){st.style.display='none';}
+    if(inp){inp.style.maxWidth='180px';inp.placeholder='Paste API key (hidden)';}
+  }
 }
 
 </script>
