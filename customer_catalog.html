@@ -490,7 +490,15 @@ let allP=[],cart=[],activeCat='',curItem=null;
 function loadData(){
   // Show localStorage immediately for fast load
   const loc=JSON.parse(localStorage.getItem('clothing_products')||'[]');
-  if(loc.length){allP=loc;renderGrid();}
+  if(loc.length){
+    // Ensure every item has photos array
+    loc.forEach(p=>{
+      if(!p.photos||!p.photos.length){
+        p.photos=p.img?[p.img]:[];
+      }
+    });
+    allP=loc;renderGrid();
+  }
   // Then fetch fresh from Google Sheet
   loadFromAPI();
   // Auto-refresh every 60 seconds
@@ -503,17 +511,26 @@ function loadFromAPI(){
     .then(r=>r.json())
     .then(data=>{
       if(data.success && data.data && data.data.length>0){
-        const loaded=data.data.map(row=>({
-          id:     String(row['Item_ID']   || row['id']    || ''),
-          name:   String(row['Item_Name'] || row['name']  || ''),
-          batch:  String(row['Batch']     || row['batch'] || ''),
-          cat:    String(row['Category']  || row['cat']   || 'Other'),
-          retail: parseFloat(row['Retail']|| row['retail']|| 0),
-          img:    String(row['Image_URL'] || row['img']   || ''),
-          qty:    parseInt(row['Qty']     || row['qty']   || 1),
-          status: String(row['Status']    || row['status']|| 'Active'),
-          notes:  String(row['Notes']     || row['notes'] || '')
-        })).filter(p=>p.id&&p.name);
+        const loaded=data.data.map(row=>{
+          const photosRaw=String(row['Photos']||row['photos']||'');
+          const photosArr=photosRaw?photosRaw.split('|').filter(u=>u&&u.startsWith('http')):[];
+          const imgUrl=String(row['Image_URL']||row['img']||'');
+          // Merge img + photos array, deduplicate
+          const allPhotos=imgUrl?[imgUrl,...photosArr.filter(u=>u!==imgUrl)]:photosArr;
+          return {
+            id:     String(row['Item_ID']   || row['id']    || ''),
+            name:   String(row['Item_Name'] || row['name']  || ''),
+            batch:  String(row['Batch']     || row['batch'] || ''),
+            cat:    String(row['Category']  || row['cat']   || 'Other'),
+            retail: parseFloat(row['Retail']|| row['retail']|| 0),
+            img:    imgUrl,
+            photos: allPhotos,
+            video:  String(row['Video']     || row['video'] || ''),
+            qty:    parseInt(row['Qty']     || row['qty']   || 1),
+            status: String(row['Status']    || row['status']|| 'Active'),
+            notes:  String(row['Notes']     || row['notes'] || '')
+          };
+        }).filter(p=>p.id&&p.name);
         if(loaded.length){
           allP=loaded;
           localStorage.setItem('clothing_products',JSON.stringify(loaded));
