@@ -116,31 +116,194 @@ body{background:var(--black);font-family:'Inter',sans-serif;color:var(--offwhite
 .wa-co-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:.45rem;background:#25d366;color:#fff;border:none;border-radius:3px;padding:.78rem;font-size:.86rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
 .cart-ct{font-size:.68rem;color:#555;text-align:center;margin-bottom:.45rem}
 
-/* ── PRODUCT MODAL ── */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;align-items:flex-end;justify-content:center}
-@media(min-width:600px){.modal-bg{align-items:center}}
+/* ══════════════════════════════════════
+   PREMIUM PRODUCT VIEWER — Mobile First
+══════════════════════════════════════ */
+.modal-bg{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.92);z-index:300;
+  align-items:flex-end;justify-content:center;
+}
 .modal-bg.open{display:flex}
-.modal{background:var(--black2);width:100%;max-width:560px;max-height:92vh;overflow-y:auto;border-radius:10px 10px 0 0;border:1px solid var(--border);display:flex;flex-direction:column;-webkit-overflow-scrolling:touch}
-@media(min-width:600px){.modal{border-radius:5px;flex-direction:row;max-height:82vh;overflow:hidden}}
-.m-img{flex:1;background:var(--black3);min-height:220px;position:relative;overflow:hidden;flex-shrink:0}
-@media(min-width:600px){.m-img{min-height:auto}}
-.m-img img{width:100%;height:100%;object-fit:cover;display:block}
-.m-img-ph{width:100%;min-height:220px;display:flex;align-items:center;justify-content:center;font-size:3.5rem}
-.m-oos-bar{position:absolute;bottom:0;left:0;right:0;background:rgba(194,24,91,.9);color:#fff;text-align:center;padding:.38rem;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em}
-.m-info{flex:1;padding:1.1rem;display:flex;flex-direction:column;gap:.55rem;overflow-y:auto}
-.m-close{align-self:flex-end;background:none;border:1px solid var(--border);color:var(--gold);width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.m-brand{display:flex;align-items:center;gap:.4rem}
-.m-brand img{height:16px;width:auto;object-fit:contain}
-.m-cat{display:inline-block;background:rgba(0,137,123,.12);color:var(--teal);font-size:.65rem;font-weight:700;padding:.16rem .55rem;border-radius:8px;text-transform:uppercase;border:1px solid rgba(0,137,123,.25)}
-.m-num{font-size:.68rem;color:#555;text-transform:uppercase;letter-spacing:.06em}
-.m-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;color:var(--gold);line-height:1.25}
-.m-price{font-size:1.35rem;font-weight:700;color:var(--gold2)}
-.m-div{height:1px;background:var(--border)}
-.m-desc{font-size:.8rem;color:#777;line-height:1.7}
-.m-atc{background:var(--gold);color:#000;border:none;border-radius:3px;padding:.78rem;font-size:.82rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;text-transform:uppercase;letter-spacing:.05em;margin-top:auto}
-.m-atc.oos{background:#222;color:#444;cursor:not-allowed}
-.m-wa{display:flex;align-items:center;justify-content:center;gap:.4rem;background:transparent;color:#25d366;border:1px solid rgba(37,211,102,.3);border-radius:3px;padding:.62rem;font-size:.78rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-top:.4rem}
-.m-wa:hover{background:#25d366;color:#fff}
+
+.modal{
+  background:var(--black2);
+  width:100%;max-width:480px;
+  height:90vh;
+  border-radius:16px 16px 0 0;
+  border:1px solid var(--border);
+  border-bottom:none;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  position:relative;
+}
+@media(min-width:600px){
+  .modal-bg{align-items:center}
+  .modal{border-radius:12px;border-bottom:1px solid var(--border);max-height:88vh;height:auto;max-width:560px}
+}
+
+/* Pull handle */
+.m-pull{height:4px;width:40px;background:rgba(255,255,255,.15);border-radius:2px;margin:.65rem auto .3rem;flex-shrink:0}
+@media(min-width:600px){.m-pull{display:none}}
+
+/* ── MEDIA SECTION (photos + video) ── */
+.m-media{
+  position:relative;
+  width:100%;
+  flex-shrink:0;
+  background:var(--black3);
+  overflow:hidden;
+}
+/* Main media display */
+.m-media-main{
+  width:100%;
+  aspect-ratio:4/3;
+  position:relative;
+  overflow:hidden;
+}
+@media(min-width:600px){.m-media-main{aspect-ratio:1/1}}
+
+.m-media-main img{
+  width:100%;height:100%;
+  object-fit:cover;display:block;
+  transition:opacity .25s;
+}
+.m-media-ph{
+  width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:4rem;
+  background:linear-gradient(135deg,#14100a,#0a1210);
+}
+
+/* Video embed */
+.m-video-frame{
+  width:100%;height:100%;
+  border:none;display:block;
+}
+
+/* OOS overlay */
+.m-oos-bar{
+  position:absolute;bottom:0;left:0;right:0;
+  background:rgba(194,24,91,.92);color:#fff;
+  text-align:center;padding:.42rem;
+  font-size:.72rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;
+}
+
+/* ── THUMBNAIL STRIP ── */
+.m-thumbs{
+  display:flex;gap:.35rem;padding:.45rem .55rem;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;flex-shrink:0;
+  background:var(--black);
+  border-bottom:1px solid var(--border);
+}
+.m-thumbs::-webkit-scrollbar{display:none}
+.m-thumb{
+  width:52px;height:52px;flex-shrink:0;
+  border-radius:4px;overflow:hidden;
+  border:2px solid transparent;
+  cursor:pointer;position:relative;
+  transition:border-color .2s;
+  background:var(--black3);
+}
+.m-thumb.active{border-color:var(--gold)}
+.m-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.m-thumb-video{
+  width:52px;height:52px;flex-shrink:0;
+  border-radius:4px;overflow:hidden;
+  border:2px solid rgba(37,211,102,.4);
+  cursor:pointer;
+  background:#0a1a0a;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:2px;
+}
+.m-thumb-video span{font-size:1.1rem}
+.m-thumb-video small{font-size:.5rem;color:#25d366;font-weight:700;letter-spacing:.04em}
+
+/* Nav arrows */
+.m-nav{
+  position:absolute;top:50%;transform:translateY(-50%);
+  background:rgba(0,0,0,.55);color:#fff;border:none;
+  width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:1.1rem;z-index:5;
+  backdrop-filter:blur(4px);
+}
+.m-nav-l{left:8px}
+.m-nav-r{right:8px}
+
+/* Media counter */
+.m-counter{
+  position:absolute;bottom:8px;right:10px;
+  background:rgba(0,0,0,.6);color:#fff;
+  font-size:.65rem;font-weight:600;
+  padding:2px 7px;border-radius:10px;
+  backdrop-filter:blur(4px);
+}
+
+/* ── INFO SECTION ── */
+.m-info{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:.85rem .95rem;
+  display:flex;flex-direction:column;gap:.5rem;
+  padding-bottom:calc(.85rem + env(safe-area-inset-bottom));
+}
+.m-top-row{display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem}
+.m-close{
+  background:rgba(255,255,255,.06);border:1px solid var(--border);
+  color:var(--offwhite);width:28px;height:28px;
+  border-radius:50%;cursor:pointer;font-size:.85rem;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.m-brand-row{display:flex;align-items:center;gap:.4rem}
+.m-brand-row img{height:14px;width:auto;object-fit:contain}
+.m-cat{
+  display:inline-block;background:rgba(0,137,123,.12);color:var(--teal);
+  font-size:.62rem;font-weight:700;padding:.14rem .5rem;
+  border-radius:8px;text-transform:uppercase;border:1px solid rgba(0,137,123,.2);
+}
+.m-item-num{font-size:.65rem;color:#555;letter-spacing:.06em;text-transform:uppercase}
+.m-name{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.25rem;font-weight:700;color:var(--gold);line-height:1.25;
+}
+.m-price-row{display:flex;align-items:center;gap:.75rem}
+.m-price{font-size:1.3rem;font-weight:700;color:var(--gold2)}
+.m-status-badge{font-size:.65rem;font-weight:700;padding:.18rem .55rem;border-radius:8px}
+.m-div{height:1px;background:var(--border);margin:.1rem 0}
+.m-desc{font-size:.8rem;color:#888;line-height:1.75}
+
+/* ── ACTION BUTTONS ── */
+.m-actions{display:flex;flex-direction:column;gap:.45rem;margin-top:auto;padding-top:.5rem}
+.m-atc{
+  background:var(--gold);color:#000;border:none;
+  border-radius:6px;padding:.82rem;
+  font-size:.85rem;font-weight:700;
+  cursor:pointer;font-family:'Inter',sans-serif;
+  text-transform:uppercase;letter-spacing:.06em;
+  width:100%;
+}
+.m-atc.oos{background:#1e1e1e;color:#444;cursor:not-allowed}
+.m-atc:active:not(.oos){transform:scale(.98)}
+.m-btns-row{display:flex;gap:.45rem}
+.m-wa{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:.4rem;
+  background:rgba(37,211,102,.08);color:#25d366;
+  border:1px solid rgba(37,211,102,.3);border-radius:6px;
+  padding:.7rem;font-size:.78rem;font-weight:600;
+  cursor:pointer;font-family:'Inter',sans-serif;
+}
+.m-wa:active{background:#25d366;color:#fff}
+.m-video-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:.4rem;
+  background:rgba(255,0,0,.07);color:#ff4444;
+  border:1px solid rgba(255,0,0,.2);border-radius:6px;
+  padding:.7rem;font-size:.78rem;font-weight:600;
+  cursor:pointer;font-family:'Inter',sans-serif;
+}
+.m-video-btn:active{background:rgba(255,0,0,.15)}
 
 /* ── FOOTER ── */
 .site-footer{background:var(--black2);border-top:1px solid var(--border);padding:1.5rem .9rem 1.2rem;text-align:center}
@@ -260,25 +423,61 @@ const API_URL='https://script.google.com/macros/s/AKfycbzculngSTM7SLtazn_Nekwhor
   </div>
 </div>
 
-<!-- MODAL -->
+<!-- PREMIUM PRODUCT VIEWER -->
 <div class="modal-bg" id="modal" onclick="closeMod(event)">
   <div class="modal" id="modal-box">
     <div class="m-pull"></div>
-    <div class="m-img" id="m-img"></div>
+
+    <!-- MEDIA SECTION -->
+    <div class="m-media">
+      <div class="m-media-main" id="m-media-main">
+        <div class="m-media-ph">👗</div>
+      </div>
+      <div class="m-counter" id="m-counter" style="display:none"></div>
+      <button class="m-nav m-nav-l" id="m-nav-l" onclick="mediaPrev()" style="display:none">‹</button>
+      <button class="m-nav m-nav-r" id="m-nav-r" onclick="mediaNext()" style="display:none">›</button>
+    </div>
+
+    <!-- THUMBNAIL STRIP -->
+    <div class="m-thumbs" id="m-thumbs"></div>
+
+    <!-- INFO SECTION -->
     <div class="m-info">
-      <button class="m-close" onclick="closeMod()">✕</button>
-      <div class="m-brand"><img src="Desi_vibes_word_only.png" alt="DV" onerror="this.style.display='none'"></div>
-      <div class="m-cat" id="m-cat"></div>
-      <div class="m-num" id="m-num"></div>
+      <div class="m-top-row">
+        <div>
+          <div class="m-brand-row">
+            <img src="Desi_vibes_word_only.png" alt="Desi Vibes" onerror="this.style.display='none'">
+          </div>
+          <div style="display:flex;align-items:center;gap:.4rem;margin-top:.3rem;flex-wrap:wrap">
+            <div class="m-cat" id="m-cat"></div>
+            <div class="m-item-num" id="m-num"></div>
+          </div>
+        </div>
+        <button class="m-close" onclick="closeMod()">✕</button>
+      </div>
+
       <div class="m-name" id="m-name"></div>
-      <div class="m-price" id="m-price"></div>
+
+      <div class="m-price-row">
+        <div class="m-price" id="m-price"></div>
+        <div class="m-status-badge" id="m-status-badge"></div>
+      </div>
+
       <div class="m-div"></div>
       <div class="m-desc" id="m-desc"></div>
-      <button class="m-atc" id="m-atc" onclick="addFromMod()">Add to Cart</button>
-      <button class="m-wa" onclick="quickWA()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        Ask About This Item
-      </button>
+
+      <div class="m-actions">
+        <button class="m-atc" id="m-atc" onclick="addFromMod()">Add to Cart</button>
+        <div class="m-btns-row">
+          <button class="m-wa" onclick="quickWA()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Ask on WhatsApp
+          </button>
+          <button class="m-video-btn" id="m-video-btn" style="display:none" onclick="openVideo()">
+            ▶ Watch Video
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -374,23 +573,142 @@ function filterCat(btn){
   btn.classList.add('active');activeCat=btn.dataset.cat;renderGrid();
 }
 
+// ── MEDIA VIEWER STATE ──
+let _media=[];   // array of {type:'photo'|'video', src:string}
+let _mediaIdx=0;
+
 function openMod(id){
   const p=allP.find(x=>x.id===id);if(!p)return;curItem=p;
   const oos=p.status!=='Active';
+
+  // ── Build media array ──
+  _media=[];
+  const photos=p.photos&&p.photos.length>0
+    ?p.photos.filter(u=>u&&!u.startsWith('data:'))
+    :(p.img&&!p.img.startsWith('data:')?[p.img]:[]);
+  photos.forEach(src=>_media.push({type:'photo',src}));
+  // Video — stored in notes as [VIDEO:url] or as p.video field
+  const videoUrl=p.video||(p.notes&&p.notes.match(/\[VIDEO:(.*?)\]/)&&p.notes.match(/\[VIDEO:(.*?)\]/)[1])||'';
+  if(videoUrl) _media.push({type:'video',src:videoUrl});
+  _mediaIdx=0;
+
+  // ── Populate text fields ──
   document.getElementById('m-cat').textContent=p.cat;
-  document.getElementById('m-num').textContent='Item # '+p.id;
+  document.getElementById('m-num').textContent='Item #'+p.id;
   document.getElementById('m-name').textContent=p.name;
   document.getElementById('m-price').textContent='$'+p.retail.toFixed(2);
-  document.getElementById('m-desc').textContent=p.notes||'Authentic Indian clothing. Contact us on WhatsApp for sizing and availability.';
-  document.getElementById('m-img').innerHTML=(p.img?`<img src="${p.img}" alt="${p.name}" onerror="this.outerHTML='<div class=m-img-ph>👗</div>'">`:`<div class="m-img-ph">👗</div>`)+(oos?`<div class="m-oos-bar">Out of Stock</div>`:'');
-  const btn=document.getElementById('m-atc');btn.textContent=oos?'Out of Stock':'Add to Cart';btn.className='m-atc'+(oos?' oos':'');
-  document.getElementById('modal').classList.add('open');document.body.style.overflow='hidden';
+  // Status badge
+  const badge=document.getElementById('m-status-badge');
+  if(oos){badge.textContent=p.status==='Pending'?'Reserved':'Out of Stock';badge.style.cssText='background:rgba(194,24,91,.15);color:var(--magenta);border:1px solid rgba(194,24,91,.3)';}
+  else{badge.textContent='Available';badge.style.cssText='background:rgba(46,125,50,.12);color:#66bb6a;border:1px solid rgba(46,125,50,.25)';}
+  // Description — strip video tag from notes display
+  const cleanDesc=(p.notes||'').replace(/\[VIDEO:.*?\]/g,'').trim();
+  document.getElementById('m-desc').textContent=cleanDesc||'Authentic Indian clothing. Contact us on WhatsApp for sizing and availability.';
+
+  // ── Cart button ──
+  const btn=document.getElementById('m-atc');
+  btn.textContent=oos?'Out of Stock':'🛍 Add to Cart';
+  btn.className='m-atc'+(oos?' oos':'');
+
+  // ── Video button ──
+  const vBtn=document.getElementById('m-video-btn');
+  if(vBtn) vBtn.style.display=videoUrl?'flex':'none';
+
+  // ── Render media ──
+  renderMedia();
+
+  // ── Thumbnail strip ──
+  renderThumbs();
+
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
 }
-function closeMod(e){if(e&&e.target!==document.getElementById('modal'))return;document.getElementById('modal').classList.remove('open');document.body.style.overflow='';curItem=null;}
+
+function renderMedia(){
+  const wrap=document.getElementById('m-media-main');
+  const counter=document.getElementById('m-counter');
+  const navL=document.getElementById('m-nav-l');
+  const navR=document.getElementById('m-nav-r');
+  if(!wrap) return;
+
+  const hasMultiple=_media.length>1;
+  if(navL) navL.style.display=hasMultiple?'flex':'none';
+  if(navR) navR.style.display=hasMultiple?'flex':'none';
+  if(counter){ counter.style.display=hasMultiple?'block':'none'; counter.textContent=(_mediaIdx+1)+' / '+_media.length; }
+
+  if(!_media.length){
+    wrap.innerHTML='<div class="m-media-ph">👗</div>';
+    return;
+  }
+
+  const item=_media[_mediaIdx];
+  if(item.type==='photo'){
+    wrap.innerHTML=`<img src="${item.src}" alt="Product photo" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.outerHTML='<div class=m-media-ph>👗</div>'">`;
+  } else if(item.type==='video'){
+    // Support YouTube, YouTube Shorts, and direct video URLs
+    let embedUrl='';
+    const ytMatch=item.src.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if(ytMatch){
+      embedUrl=`https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&rel=0&playsinline=1`;
+      wrap.innerHTML=`<iframe class="m-video-frame" src="${embedUrl}" allow="autoplay;encrypted-media;picture-in-picture" allowfullscreen title="Product video"></iframe>`;
+    } else {
+      wrap.innerHTML=`<video style="width:100%;height:100%;object-fit:cover;display:block" controls playsinline autoplay muted><source src="${item.src}">Your browser does not support video.</video>`;
+    }
+  }
+  // Update thumb highlights
+  document.querySelectorAll('.m-thumb').forEach((t,i)=>t.classList.toggle('active',i===_mediaIdx));
+}
+
+function renderThumbs(){
+  const strip=document.getElementById('m-thumbs');
+  if(!strip) return;
+  if(_media.length<=1){strip.style.display='none';return;}
+  strip.style.display='flex';
+  strip.innerHTML=_media.map((item,i)=>{
+    if(item.type==='photo'){
+      return `<div class="m-thumb ${i===0?'active':''}" onclick="goMedia(${i})">
+        <img src="${item.src}" onerror="this.style.display='none'">
+      </div>`;
+    } else {
+      return `<div class="m-thumb-video" onclick="goMedia(${i})">
+        <span>▶</span><small>VIDEO</small>
+      </div>`;
+    }
+  }).join('');
+}
+
+function goMedia(idx){
+  _mediaIdx=idx;
+  renderMedia();
+}
+function mediaNext(){ _mediaIdx=(_mediaIdx+1)%_media.length; renderMedia(); }
+function mediaPrev(){ _mediaIdx=(_mediaIdx-1+_media.length)%_media.length; renderMedia(); }
+
+function openVideo(){
+  // Find video in media array and jump to it
+  const vIdx=_media.findIndex(m=>m.type==='video');
+  if(vIdx>-1){ goMedia(vIdx); }
+}
+
+function closeMod(e){
+  if(e&&e.target!==document.getElementById('modal'))return;
+  // Stop any playing video
+  const vframe=document.querySelector('.m-video-frame');
+  if(vframe) vframe.src=vframe.src;
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow='';
+  curItem=null;
+}
 function addFromMod(){if(!curItem||curItem.status!=='Active')return;addToCart(curItem.id);closeMod();}
 function quickWA(){
   if(!curItem)return;
-  const p=curItem;window.open(`https://wa.me/${YOUR_WHATSAPP}?text=${encodeURIComponent(`Hi Desi Vibes! 👗\n\nInterested in:\n*${p.name}*\nItem # ${p.id} · $${p.retail.toFixed(2)}\n\nAvailable? 🙏`)}`,'_blank');
+  const p=curItem;
+  const photos=p.photos&&p.photos.length>0?p.photos.filter(u=>u&&!u.startsWith('data:')):(p.img?[p.img]:[]);
+  const photoLinks=photos.length>0?'\n📸 Photos:\n'+photos.map((u,i)=>`  ${i+1}. ${u}`).join('\n'):'';
+  const videoUrl=p.video||'';
+  const videoLink=videoUrl?`\n▶ Video: ${videoUrl}`:'';
+  const msg=`Hi Desi Vibes! 👗\n\nI'm interested in:\n*${p.name}*\nItem # ${p.id}  ·  $${p.retail.toFixed(2)}${photoLinks}${videoLink}\n\nIs this available? 🙏`;
+  window.open(`https://wa.me/${YOUR_WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank');
 }
 
 function addToCart(id){
@@ -445,27 +763,21 @@ function openStoreWA(){window.open(`https://wa.me/${YOUR_WHATSAPP}?text=${encode
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
 
-// Swipe down to close modal
-let ty=0;
+// Swipe support
+let _ty=0,_tx=0;
 const mb=document.getElementById('modal-box');
-mb.addEventListener('touchstart',e=>{ty=e.touches[0].clientY;},{passive:true});
-mb.addEventListener('touchmove',e=>{if(e.touches[0].clientY-ty>70){document.getElementById('modal').classList.remove('open');document.body.style.overflow='';}},{passive:true});
+mb.addEventListener('touchstart',e=>{_ty=e.touches[0].clientY;_tx=e.touches[0].clientX;},{passive:true});
+mb.addEventListener('touchend',e=>{
+  const dy=e.changedTouches[0].clientY-_ty;
+  const dx=e.changedTouches[0].clientX-_tx;
+  // Swipe down to close
+  if(dy>80&&Math.abs(dx)<60){closeMod();}
+  // Swipe left/right to change media
+  else if(Math.abs(dx)>55&&Math.abs(dy)<60&&_media.length>1){
+    if(dx<0) mediaNext(); else mediaPrev();
+  }
+},{passive:true});
 
-
-// Photo gallery functions
-function galShow(idx){
-  const photos=window._galPhotos||[];
-  if(!photos[idx]) return;
-  window._galIdx=idx;
-  const img=document.getElementById('m-gal-img');
-  if(img) img.src=photos[idx];
-  photos.forEach((_,i)=>{
-    const d=document.getElementById('gd-'+i);
-    if(d) d.style.background=i===idx?'var(--gold)':'rgba(255,255,255,.4)';
-  });
-}
-function galNext(){ const p=window._galPhotos||[]; galShow((window._galIdx+1)%p.length); }
-function galPrev(){ const p=window._galPhotos||[]; galShow((window._galIdx-1+p.length)%p.length); }
 
 loadData();
 </script>
