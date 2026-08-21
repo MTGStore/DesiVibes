@@ -500,11 +500,17 @@ function loadData(){
   // Show localStorage immediately for fast load
   const loc=JSON.parse(localStorage.getItem('clothing_products')||'[]');
   if(loc.length){
-    // Ensure every item has photos array
+    // Ensure every item has photos as proper array
     loc.forEach(p=>{
-      if(!p.photos||!p.photos.length){
+      if(!p.photos) p.photos=p.img?[p.img]:[];
+      else if(typeof p.photos==='string'){
+        // Was stored as pipe-string
+        const arr=p.photos.split('|').filter(u=>u&&u.startsWith('http'));
+        p.photos=p.img&&!arr.includes(p.img)?[p.img,...arr]:arr;
+      } else if(!Array.isArray(p.photos)){
         p.photos=p.img?[p.img]:[];
       }
+      if(!p.photos.length && p.img) p.photos=[p.img];
     });
     allP=loc;renderGrid();
   }
@@ -521,23 +527,33 @@ function loadFromAPI(){
     .then(data=>{
       if(data.success && data.data && data.data.length>0){
         const loaded=data.data.map(row=>{
-          const photosRaw=String(row['Photos']||row['photos']||'');
-          const photosArr=photosRaw?photosRaw.split('|').filter(u=>u&&u.startsWith('http')):[];
-          const imgUrl=String(row['Image_URL']||row['img']||'');
-          // Merge img + photos array, deduplicate
-          const allPhotos=imgUrl?[imgUrl,...photosArr.filter(u=>u!==imgUrl)]:photosArr;
+          // Get image URL
+          const imgUrl=String(row['Image_URL']||row['img']||'').trim();
+          // Get photos string (pipe separated) — column K
+          const photosRaw=String(row['Photos']||row['photos']||'').trim();
+          // Build photos array — split pipe string, filter valid URLs, deduplicate
+          const seen=new Set();
+          const allPhotos=[];
+          const tryAdd=(u)=>{
+            u=String(u||'').trim();
+            if(u&&u.startsWith('http')&&!seen.has(u)){seen.add(u);allPhotos.push(u);}
+          };
+          tryAdd(imgUrl);
+          if(photosRaw) photosRaw.split('|').forEach(tryAdd);
+          // Get video URL
+          const videoUrl=String(row['Video']||row['video']||'').trim();
           return {
-            id:     String(row['Item_ID']   || row['id']    || ''),
-            name:   String(row['Item_Name'] || row['name']  || ''),
-            batch:  String(row['Batch']     || row['batch'] || ''),
-            cat:    String(row['Category']  || row['cat']   || 'Other'),
+            id:     String(row['Item_ID']   || row['id']    || '').trim(),
+            name:   String(row['Item_Name'] || row['name']  || '').trim(),
+            batch:  String(row['Batch']     || row['batch'] || '').trim(),
+            cat:    String(row['Category']  || row['cat']   || 'Other').trim(),
             retail: parseFloat(row['Retail']|| row['retail']|| 0),
             img:    imgUrl,
             photos: allPhotos,
-            video:  String(row['Video']     || row['video'] || ''),
+            video:  videoUrl,
             qty:    parseInt(row['Qty']     || row['qty']   || 1),
-            status: String(row['Status']    || row['status']|| 'Active'),
-            notes:  String(row['Notes']     || row['notes'] || '')
+            status: String(row['Status']    || row['status']|| 'Active').trim(),
+            notes:  String(row['Notes']     || row['notes'] || '').trim()
           };
         }).filter(p=>p.id&&p.name);
         if(loaded.length){
@@ -607,15 +623,45 @@ function openMod(id){
   const p=allP.find(x=>x.id===id);if(!p)return;curItem=p;
   const oos=p.status!=='Active';
 
-  // ── Build media array ──
+  // ── Build media array robustly ──
   _media=[];
-  const photos=p.photos&&p.photos.length>0
-    ?p.photos.filter(u=>u&&!u.startsWith('data:'))
-    :(p.img&&!p.img.startsWith('data:')?[p.img]:[]);
-  photos.forEach(src=>_media.push({type:'photo',src}));
-  // Video — stored in notes as [VIDEO:url] or as p.video field
-  const videoUrl=p.video||(p.notes&&p.notes.match(/\[VIDEO:(.*?)\]/)&&p.notes.match(/\[VIDEO:(.*?)\]/)[1])||'';
+
+  // Collect all photo URLs from every possible source
+  const seen=new Set();
+  const addPhoto=(url)=>{
+    if(!url) return;
+    url=String(url).trim();
+    if(!url||url==='undefined'||url==='null') return;
+    if(url.startsWith('data:')) return; // skip base64
+    if(!url.startsWith('http')) return; // skip invalid
+    if(seen.has(url)) return; // skip duplicates
+    seen.add(url);
+    _media.push({type:'photo',src:url});
+  };
+
+  // 1. Main image
+  addPhoto(p.img);
+
+  // 2. Photos array (may be string from sheet or array)
+  if(p.photos){
+    if(Array.isArray(p.photos)){
+      p.photos.forEach(addPhoto);
+    } else if(typeof p.photos==='string' && p.photos.includes('http')){
+      // Pipe-separated string from sheet
+      p.photos.split('|').forEach(addPhoto);
+    }
+  }
+
+  // 3. Video
+  let videoUrl='';
+  if(p.video && p.video.includes('youtu')){
+    videoUrl=p.video.trim();
+  } else if(p.notes){
+    const m=p.notes.match(/\[VIDEO:(.*?)\]/);
+    if(m) videoUrl=m[1].trim();
+  }
   if(videoUrl) _media.push({type:'video',src:videoUrl});
+
   _mediaIdx=0;
 
   // ── Populate text fields ──
