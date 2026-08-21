@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#080808">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Add Item — Desi Vibes</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --gold:#C9973A;--gold2:#e8b84b;--gold-dim:#8a6520;
+  --magenta:#C2185B;--teal:#00897B;
+  --black:#080808;--card:#141414;--card2:#1c1c1c;
+  --border:rgba(201,151,58,.2);--border2:rgba(201,151,58,.4);
+  --text:#f0ebe0;--muted:#666;--red:#e53935;
+}
+html,body{height:100%;background:var(--black);color:var(--text);font-family:'Inter',sans-serif;overflow-x:hidden}
+body{display:flex;flex-direction:column;min-height:100vh}
+
+/* ── TOP BAR ── */
+.topbar{
+  background:var(--black);border-bottom:1px solid var(--border);
+  padding:.75rem 1rem;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;
+}
+.topbar-logo{height:28px;width:auto;object-fit:contain}
+.topbar-title{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:700;color:var(--gold)}
+.topbar-back{color:var(--gold);font-size:.8rem;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:.3rem;padding:.4rem .6rem;border:1px solid var(--border);border-radius:20px}
+
+/* ── LOGIN ── */
+#login{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:2rem 1.5rem;text-align:center;gap:1.25rem;
+}
+.login-logo{height:80px;width:auto;object-fit:contain;margin-bottom:.5rem}
+.login-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--gold);font-weight:700}
+.login-sub{font-size:.78rem;color:var(--muted)}
+.pin-wrap{display:flex;gap:.6rem;justify-content:center;margin:.25rem 0}
+.pin-dot{width:48px;height:48px;border:2px solid var(--border);border-radius:12px;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:var(--gold);font-weight:700;transition:.15s}
+.pin-dot.filled{border-color:var(--gold);background:rgba(201,151,58,.08)}
+.pin-dot.error{border-color:var(--red);animation:shake .3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;max-width:260px;margin:0 auto}
+.numkey{
+  height:58px;border-radius:14px;border:1px solid var(--border);
+  background:var(--card);color:var(--text);
+  font-size:1.3rem;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Inter',sans-serif;
+  transition:.1s;
+  -webkit-tap-highlight-color:transparent;
+}
+.numkey:active{background:rgba(201,151,58,.15);border-color:var(--gold);transform:scale(.96)}
+.numkey.del{font-size:.9rem;color:var(--muted)}
+.numkey.zero{grid-column:2}
+
+/* ── MAIN APP ── */
+#app{display:none;flex:1;flex-direction:column}
+
+/* ── PROGRESS BAR ── */
+.progress-wrap{padding:.6rem 1rem .3rem;background:var(--black)}
+.progress-label{font-size:.68rem;color:var(--muted);margin-bottom:.35rem;display:flex;justify-content:space-between}
+.progress-track{height:3px;background:var(--card2);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:2px;transition:width .35s ease}
+
+/* ── STEPS ── */
+.steps-wrap{flex:1;overflow:hidden;position:relative}
+.step{
+  position:absolute;inset:0;
+  padding:1.25rem 1.1rem;
+  display:flex;flex-direction:column;gap:1rem;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  opacity:0;pointer-events:none;transform:translateX(40px);
+  transition:opacity .3s,transform .3s;
+}
+.step.active{opacity:1;pointer-events:auto;transform:translateX(0)}
+.step.exit-left{opacity:0;transform:translateX(-40px)}
+
+.step-icon{font-size:2.2rem;text-align:center;margin-bottom:.25rem}
+.step-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:var(--gold);text-align:center;line-height:1.2}
+.step-sub{font-size:.78rem;color:var(--muted);text-align:center;line-height:1.5}
+
+/* ── INPUTS ── */
+.inp-label{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.45rem}
+.inp{
+  width:100%;padding:.95rem 1rem;
+  background:var(--card);border:2px solid var(--border);border-radius:12px;
+  font-size:1rem;color:var(--text);font-family:'Inter',sans-serif;
+  outline:none;transition:.2s;
+  -webkit-appearance:none;appearance:none;
+}
+.inp:focus{border-color:var(--gold);background:rgba(201,151,58,.04)}
+.inp::placeholder{color:#444}
+.inp-big{font-size:1.2rem;text-align:center;letter-spacing:.05em}
+select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23C9973A' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;padding-right:2.5rem}
+.price-row{display:flex;gap:.65rem}
+.price-row>div{flex:1}
+.price-prefix{position:relative}
+.price-prefix .inp{padding-left:1.75rem}
+.price-prefix::before{content:'$';position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:var(--gold);font-weight:700;font-size:1rem;pointer-events:none}
+
+/* ── PHOTO ZONE ── */
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:.6rem}
+.photo-slot{
+  aspect-ratio:1;border-radius:10px;overflow:hidden;
+  position:relative;background:var(--card2);
+  border:2px dashed var(--border);
+}
+.photo-slot img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-slot .slot-rm{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.7);color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:.7rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.photo-slot .main-badge{position:absolute;bottom:3px;left:3px;background:var(--gold);color:#000;font-size:.55rem;font-weight:700;padding:1px 5px;border-radius:3px}
+.add-photo-btn{
+  aspect-ratio:1;border-radius:10px;
+  border:2px dashed rgba(201,151,58,.35);
+  background:rgba(201,151,58,.04);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:.3rem;cursor:pointer;color:var(--gold);font-size:.72rem;font-weight:600;
+  transition:.2s;
+}
+.add-photo-btn:active{background:rgba(201,151,58,.1);transform:scale(.97)}
+.add-photo-btn .icon{font-size:1.6rem}
+#photo-file-input{display:none}
+
+/* Upload status */
+.upload-status{
+  padding:.55rem .8rem;border-radius:8px;font-size:.78rem;font-weight:600;
+  display:none;margin-top:.2rem;align-items:center;gap:.4rem;
+}
+.upload-status.uploading{display:flex;background:rgba(201,151,58,.08);color:var(--gold);border:1px solid var(--border)}
+.upload-status.success{display:flex;background:rgba(46,125,50,.1);color:#66bb6a;border:1px solid rgba(46,125,50,.25)}
+.upload-status.error{display:flex;background:rgba(229,57,53,.08);color:#ef5350;border:1px solid rgba(229,57,53,.2)}
+.spin{animation:spin .8s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── VIDEO ── */
+.video-wrap{display:flex;flex-direction:column;gap:.6rem}
+.video-preview{
+  border-radius:10px;background:var(--card);border:1px solid var(--border);
+  padding:.75rem;display:none;align-items:center;gap:.65rem;
+}
+.video-preview.show{display:flex}
+.video-thumb{width:52px;height:38px;border-radius:6px;background:#0f0f0f;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.video-info{flex:1;min-width:0}
+.video-url-text{font-size:.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.video-rm{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.85rem;flex-shrink:0}
+.paste-btn{
+  width:100%;padding:.9rem;border-radius:12px;
+  background:rgba(37,211,102,.06);color:#25d366;
+  border:2px dashed rgba(37,211,102,.25);
+  font-size:.9rem;font-weight:600;font-family:'Inter',sans-serif;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem;
+  transition:.2s;
+}
+.paste-btn:active{background:rgba(37,211,102,.12);transform:scale(.98)}
+.yt-hint{font-size:.72rem;color:var(--muted);text-align:center;line-height:1.6}
+
+/* ── MARGIN DISPLAY ── */
+.margin-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:.85rem 1rem}
+.margin-row{display:flex;justify-content:space-between;font-size:.82rem;padding:.3rem 0;border-bottom:1px solid rgba(201,151,58,.06)}
+.margin-row:last-child{border:none;font-weight:700;font-size:.92rem;padding-top:.5rem}
+.margin-row span:last-child{color:var(--gold)}
+.margin-bar-wrap{height:6px;background:var(--card2);border-radius:3px;overflow:hidden;margin-top:.75rem}
+.margin-bar-fill{height:100%;background:linear-gradient(90deg,var(--magenta),var(--gold),#66bb6a);border-radius:3px;transition:width .4s}
+
+/* ── REVIEW CARD ── */
+.review-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.review-img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:var(--card2)}
+.review-img-ph{width:100%;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;font-size:3rem;background:linear-gradient(135deg,#14100a,#0a1210)}
+.review-body{padding:.85rem 1rem;display:flex;flex-direction:column;gap:.4rem}
+.review-name{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:700;color:var(--gold)}
+.review-meta{font-size:.75rem;color:var(--muted);display:flex;gap:.75rem;flex-wrap:wrap}
+.review-meta span{display:flex;align-items:center;gap:.2rem}
+.review-price{font-size:1.1rem;font-weight:700;color:var(--gold2)}
+.review-photos{display:flex;gap:.4rem;overflow-x:auto;padding:.1rem 0;scrollbar-width:none}
+.review-photos::-webkit-scrollbar{display:none}
+.review-photo-thumb{width:48px;height:48px;border-radius:6px;object-fit:cover;flex-shrink:0;border:1.5px solid var(--border)}
+.review-video-badge{display:inline-flex;align-items:center;gap:.3rem;background:rgba(255,0,0,.08);color:#ff4444;border:1px solid rgba(255,0,0,.2);border-radius:8px;padding:.2rem .55rem;font-size:.7rem;font-weight:600}
+
+/* ── BOTTOM NAV BUTTONS ── */
+.bottom-nav{
+  padding:.85rem 1rem;
+  display:flex;gap:.65rem;
+  background:var(--black);border-top:1px solid var(--border);
+  position:sticky;bottom:0;
+  padding-bottom:max(.85rem, env(safe-area-inset-bottom));
+}
+.btn-back{
+  flex:1;padding:.88rem;border-radius:12px;
+  border:1.5px solid var(--border);background:transparent;
+  color:var(--text);font-size:.9rem;font-weight:600;
+  font-family:'Inter',sans-serif;cursor:pointer;
+}
+.btn-back:active{background:var(--card)}
+.btn-next{
+  flex:2;padding:.88rem;border-radius:12px;
+  border:none;background:var(--gold);
+  color:#000;font-size:.95rem;font-weight:700;
+  font-family:'Inter',sans-serif;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:.4rem;
+}
+.btn-next:active{transform:scale(.98)}
+.btn-next:disabled{background:#333;color:#666;cursor:not-allowed}
+.btn-save{
+  flex:2;padding:.88rem;border-radius:12px;
+  border:none;background:#66bb6a;
+  color:#000;font-size:.95rem;font-weight:700;
+  font-family:'Inter',sans-serif;cursor:pointer;
+}
+.btn-save:active{transform:scale(.98)}
+
+/* ── SUCCESS SCREEN ── */
+#success{display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;text-align:center;gap:1.1rem}
+.success-icon{font-size:4rem;animation:pop .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.success-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:var(--gold);font-weight:700}
+.success-sub{font-size:.82rem;color:var(--muted);line-height:1.7}
+.btn-add-another{width:100%;padding:.88rem;border-radius:12px;border:none;background:var(--gold);color:#000;font-size:.95rem;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;max-width:320px}
+.btn-view-site{width:100%;padding:.88rem;border-radius:12px;border:1.5px solid var(--border);background:transparent;color:var(--text);font-size:.88rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;max-width:320px}
+
+/* TOAST */
+.toast{position:fixed;bottom:5rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--card);color:var(--text);padding:.55rem 1.1rem;border-radius:20px;font-size:.8rem;font-weight:600;z-index:999;opacity:0;transition:.25s;white-space:nowrap;border:1px solid var(--border)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a class="topbar-back" href="admin_panel.html">← Admin</a>
+  <div class="topbar-title">Add Item</div>
+  <img class="topbar-logo" src="Desi_Vibe_Logo.png" alt="DV" onerror="this.style.display='none'">
+</div>
+
+<!-- LOGIN -->
+<div id="login">
+  <img class="login-logo" src="Desi_vibes_word_only.png" alt="Desi Vibes" onerror="this.style.display='none'">
+  <div>
+    <div class="login-title">Admin Access</div>
+    <div class="login-sub" style="margin-top:.3rem">Enter your password</div>
+  </div>
+  <div class="pin-wrap" id="pin-display">
+    <div class="pin-dot" id="pd0">–</div>
+    <div class="pin-dot" id="pd1">–</div>
+    <div class="pin-dot" id="pd2">–</div>
+    <div class="pin-dot" id="pd3">–</div>
+  </div>
+  <div id="pin-err" style="color:#ef5350;font-size:.75rem;display:none">Incorrect password. Try again.</div>
+  <!-- Use full keyboard for password -->
+  <input type="password" id="pwd-mobile" placeholder="Enter password"
+    style="width:100%;max-width:300px;padding:.9rem 1rem;background:var(--card);border:2px solid var(--border);border-radius:12px;font-size:1rem;color:var(--text);font-family:'Inter',sans-serif;outline:none;text-align:center"
+    onkeydown="if(event.key==='Enter')doLogin()"
+    oninput="updatePinDisplay(this.value)">
+  <button onclick="doLogin()"
+    style="width:100%;max-width:300px;padding:.9rem;border-radius:12px;border:none;background:var(--gold);color:#000;font-size:1rem;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer">
+    Sign In
+  </button>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span id="step-label">Step 1 of 5</span>
+      <span id="step-name" style="color:var(--gold)">Item Details</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:20%"></div></div>
+  </div>
+
+  <!-- Steps container -->
+  <div class="steps-wrap" id="steps-wrap">
+
+    <!-- STEP 1: Item Details -->
+    <div class="step active" id="step-1">
+      <div class="step-icon">🏷️</div>
+      <div class="step-title">Item Details</div>
+      <div class="step-sub">Fill in the basic info about this item</div>
+
+      <div>
+        <div class="inp-label">Batch #</div>
+        <input class="inp" type="text" id="s-batch" placeholder="e.g. Batch 1, Aug 2026" autocomplete="off">
+      </div>
+      <div>
+        <div class="inp-label">Item Number *</div>
+        <input class="inp inp-big" type="text" id="s-id" placeholder="e.g. IC001" autocomplete="off" autocapitalize="characters">
+      </div>
+      <div>
+        <div class="inp-label">Item Name *</div>
+        <input class="inp" type="text" id="s-name" placeholder="e.g. Red Banarasi Saree" autocomplete="off">
+      </div>
+      <div>
+        <div class="inp-label">Category</div>
+        <select class="inp" id="s-cat">
+          <option>Saree</option>
+          <option>Salwar Suit</option>
+          <option>Lehenga</option>
+          <option>Kurti</option>
+          <option>Dupatta</option>
+          <option>Dress Material</option>
+          <option>Indo-Western</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- STEP 2: Pricing -->
+    <div class="step" id="step-2">
+      <div class="step-icon">💰</div>
+      <div class="step-title">Pricing</div>
+      <div class="step-sub">What did you pay and what are you selling for?</div>
+
+      <div class="price-row">
+        <div>
+          <div class="inp-label">Your Cost *</div>
+          <div class="price-prefix">
+            <input class="inp" type="number" id="s-cost" placeholder="0.00" inputmode="decimal" step="0.01" min="0" oninput="calcMargin()">
+          </div>
+        </div>
+        <div>
+          <div class="inp-label">Retail Price *</div>
+          <div class="price-prefix">
+            <input class="inp" type="number" id="s-retail" placeholder="0.00" inputmode="decimal" step="0.01" min="0" oninput="calcMargin()">
+          </div>
+        </div>
+      </div>
+
+      <div class="margin-card" id="margin-card">
+        <div class="margin-row"><span>Gross Profit</span><span id="m-profit">$0.00</span></div>
+        <div class="margin-row"><span>Margin</span><span id="m-margin">0%</span></div>
+        <div class="margin-row"><span>Markup</span><span id="m-markup">0%</span></div>
+        <div class="margin-bar-wrap"><div class="margin-bar-fill" id="m-bar" style="width:0%"></div></div>
+      </div>
+
+      <div>
+        <div class="inp-label">Quantity</div>
+        <input class="inp inp-big" type="number" id="s-qty" value="1" min="1" inputmode="numeric">
+      </div>
+    </div>
+
+    <!-- STEP 3: Photos -->
+    <div class="step" id="step-3">
+      <div class="step-icon">📸</div>
+      <div class="step-title">Product Photos</div>
+      <div class="step-sub">Add up to 5 photos. First photo is the main one shown to customers.</div>
+
+      <div class="photo-grid" id="photo-grid"></div>
+      <div class="upload-status" id="upload-status"></div>
+
+      <input type="file" id="photo-file-input" accept="image/*" multiple onchange="handlePhotoFiles(event)">
+    </div>
+
+    <!-- STEP 4: Video -->
+    <div class="step" id="step-4">
+      <div class="step-icon">▶️</div>
+      <div class="step-title">Add Video</div>
+      <div class="step-sub">Optional — paste a YouTube link so customers can see the item in motion.</div>
+
+      <div class="video-wrap">
+        <div class="video-preview" id="video-preview">
+          <div class="video-thumb">▶</div>
+          <div class="video-info">
+            <div style="font-size:.8rem;font-weight:600;color:var(--text);margin-bottom:.18rem">YouTube Video</div>
+            <div class="video-url-text" id="video-url-text"></div>
+          </div>
+          <button class="video-rm" onclick="removeVideo()">✕</button>
+        </div>
+
+        <button class="paste-btn" onclick="pasteVideo()">
+          📋 Paste YouTube Link
+        </button>
+
+        <div class="yt-hint">
+          <strong style="color:var(--text)">From YouTube app:</strong><br>
+          Open video → tap <strong style="color:var(--gold)">Share → Copy Link</strong> → come back here → tap Paste
+        </div>
+
+        <div style="margin-top:.5rem">
+          <div class="inp-label">Or type/paste URL manually</div>
+          <input class="inp" type="url" id="s-video"
+            placeholder="https://youtube.com/watch?v=..."
+            oninput="handleVideoInput(this.value)">
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5: Description + Review -->
+    <div class="step" id="step-5">
+      <div class="step-icon">✍️</div>
+      <div class="step-title">Description & Review</div>
+      <div class="step-sub">Add a description then review before saving.</div>
+
+      <div>
+        <div class="inp-label">Description (shown to customers)</div>
+        <textarea class="inp" id="s-notes" rows="3"
+          placeholder="e.g. Pure silk, hand embroidered, free size fits S-XL. Color: Deep Red."
+          style="resize:none;min-height:80px;line-height:1.5"></textarea>
+      </div>
+
+      <!-- Review card -->
+      <div class="inp-label" style="margin-top:.25rem">Review Your Item</div>
+      <div class="review-card">
+        <div id="review-img-wrap"></div>
+        <div class="review-body">
+          <div class="review-name" id="rv-name">—</div>
+          <div class="review-meta">
+            <span>🏷️ <span id="rv-id">—</span></span>
+            <span>📂 <span id="rv-cat">—</span></span>
+            <span>📦 <span id="rv-batch">—</span></span>
+          </div>
+          <div class="review-price" id="rv-price">$0.00</div>
+          <div id="rv-photos" class="review-photos"></div>
+          <div id="rv-video-badge" style="display:none;margin-top:.3rem">
+            <span class="review-video-badge">▶ Video attached</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /steps-wrap -->
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <button class="btn-back" id="btn-back" onclick="prevStep()" style="display:none">← Back</button>
+    <button class="btn-next" id="btn-next" onclick="nextStep()">Next →</button>
+    <button class="btn-save" id="btn-save" style="display:none" onclick="saveItem()">✅ Save Item</button>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div id="success">
+  <div class="success-icon">🎉</div>
+  <div class="success-title">Item Added!</div>
+  <div class="success-sub" id="success-msg">Your item has been saved and is now live on desivibes.org</div>
+  <button class="btn-add-another" onclick="addAnother()">➕ Add Another Item</button>
+  <button class="btn-view-site" onclick="window.open('customer_catalog.html','_blank')">👁 View on Website</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONSTANTS ──
+const _k    = atob(atob('UjNOd05EQTBOalk0T1RBNU1TUT0='));
+const API_URL = 'https://script.google.com/macros/s/AKfycbzculngSTM7SLtazn_NekwhorIJwGrVLCBExkxYL7L30cIgRnhATlo8gi2dpS0IUkE4/exec';
+
+// ── LOGIN ──
+function updatePinDisplay(val){
+  const dots = ['pd0','pd1','pd2','pd3'];
+  dots.forEach((id,i)=>{
+    const el=document.getElementById(id);
+    el.textContent = i<val.length ? '●' : '–';
+    el.classList.toggle('filled', i<val.length);
+    el.classList.remove('error');
+  });
+}
+
+function doLogin(){
+  const v = document.getElementById('pwd-mobile').value;
+  if(v === _k){
+    sessionStorage.setItem('auth','1');
+    document.getElementById('login').style.display='none';
+    document.getElementById('app').style.display='flex';
+    loadConfig();
+    renderPhotoGrid();
+  } else {
+    ['pd0','pd1','pd2','pd3'].forEach(id=>{
+      const el=document.getElementById(id);
+      el.classList.add('error');
+    });
+    document.getElementById('pin-err').style.display='block';
+    setTimeout(()=>{
+      document.getElementById('pin-err').style.display='none';
+      document.getElementById('pwd-mobile').value='';
+      updatePinDisplay('');
+    },1200);
+  }
+}
+
+// Check existing session
+if(sessionStorage.getItem('auth')==='1'){
+  document.getElementById('login').style.display='none';
+  document.getElementById('app').style.display='flex';
+  loadConfig();
+}
+
+// ── CONFIG: load ImgBB key from sheet ──
+function loadConfig(){
+  const saved=localStorage.getItem('imgbb_key');
+  if(saved) window._imgbbKey=saved;
+  if(API_URL){
+    fetch(API_URL+'?action=getConfig&t='+Date.now(),{redirect:'follow'})
+      .then(r=>r.json()).then(d=>{
+        if(d.success && d.imgbb_key){
+          window._imgbbKey=d.imgbb_key;
+          localStorage.setItem('imgbb_key',d.imgbb_key);
+        }
+      }).catch(()=>{});
+  }
+}
+
+// ── STEP MANAGEMENT ──
+let currentStep = 1;
+const TOTAL_STEPS = 5;
+const STEP_NAMES = ['Item Details','Pricing','Photos','Video','Review'];
+
+function showStep(n){
+  document.querySelectorAll('.step').forEach(s=>{
+    s.classList.remove('active','exit-left');
+    if(n > currentStep) s.classList.add('exit-left');
+  });
+  const el=document.getElementById('step-'+n);
+  if(el) setTimeout(()=>el.classList.add('active'),10);
+  currentStep=n;
+  updateUI();
+  if(n===5) populateReview();
+}
+
+function updateUI(){
+  const n=currentStep;
+  document.getElementById('step-label').textContent=`Step ${n} of ${TOTAL_STEPS}`;
+  document.getElementById('step-name').textContent=STEP_NAMES[n-1];
+  document.getElementById('progress-fill').style.width=((n/TOTAL_STEPS)*100)+'%';
+  document.getElementById('btn-back').style.display=n>1?'block':'none';
+  document.getElementById('btn-next').style.display=n<TOTAL_STEPS?'flex':'none';
+  document.getElementById('btn-save').style.display=n===TOTAL_STEPS?'block':'none';
+  // Scroll step to top
+  const el=document.getElementById('step-'+n);
+  if(el) el.scrollTop=0;
+}
+
+function nextStep(){
+  if(!validateStep()) return;
+  if(currentStep<TOTAL_STEPS) showStep(currentStep+1);
+}
+function prevStep(){
+  if(currentStep>1) showStep(currentStep-1);
+}
+
+function validateStep(){
+  if(currentStep===1){
+    const id=document.getElementById('s-id').value.trim();
+    const name=document.getElementById('s-name').value.trim();
+    if(!id){showToast('Item Number is required');document.getElementById('s-id').focus();return false;}
+    if(!name){showToast('Item Name is required');document.getElementById('s-name').focus();return false;}
+    // Check duplicate
+    const existing=JSON.parse(localStorage.getItem('clothing_products')||'[]');
+    if(existing.find(p=>p.id===id)){showToast('Item #'+id+' already exists');return false;}
+  }
+  if(currentStep===2){
+    const cost=parseFloat(document.getElementById('s-cost').value)||0;
+    const retail=parseFloat(document.getElementById('s-retail').value)||0;
+    if(retail<=0){showToast('Retail price is required');document.getElementById('s-retail').focus();return false;}
+  }
+  return true;
+}
+
+// ── MARGIN CALCULATOR ──
+function calcMargin(){
+  const cost=parseFloat(document.getElementById('s-cost').value)||0;
+  const retail=parseFloat(document.getElementById('s-retail').value)||0;
+  const profit=retail-cost;
+  const margin=retail>0?(profit/retail*100):0;
+  const markup=cost>0?(profit/cost*100):0;
+  document.getElementById('m-profit').textContent='$'+profit.toFixed(2);
+  document.getElementById('m-margin').textContent=margin.toFixed(1)+'%';
+  document.getElementById('m-markup').textContent=markup.toFixed(1)+'%';
+  document.getElementById('m-bar').style.width=Math.min(Math.max(margin,0),100)+'%';
+}
+
+// ── PHOTOS ──
+let photos=[]; // array of URLs
+
+function renderPhotoGrid(){
+  const grid=document.getElementById('photo-grid');
+  if(!grid) return;
+  const slots=photos.map((url,i)=>`
+    <div class="photo-slot">
+      <img src="${url}" onerror="this.style.display='none'">
+      <button class="slot-rm" onclick="removePhoto(${i})">✕</button>
+      ${i===0?'<div class="main-badge">MAIN</div>':''}
+    </div>`).join('');
+  const addBtn=photos.length<5?`
+    <div class="add-photo-btn" onclick="document.getElementById('photo-file-input').click()">
+      <div class="icon">📷</div>
+      <span>Add Photo</span>
+    </div>`:'';
+  grid.innerHTML=slots+addBtn;
+}
+
+function removePhoto(idx){
+  photos.splice(idx,1);
+  renderPhotoGrid();
+}
+
+async function handlePhotoFiles(e){
+  const files=Array.from(e.target.files);
+  e.target.value='';
+  const remaining=5-photos.length;
+  const toUpload=files.slice(0,remaining);
+  if(!toUpload.length) return;
+
+  const status=document.getElementById('upload-status');
+  status.className='upload-status uploading';
+  status.innerHTML='<span class="spin">⏳</span> Uploading '+toUpload.length+' photo'+(toUpload.length>1?'s':'')+'...';
+
+  let uploaded=0,failed=0;
+  for(const file of toUpload){
+    try{
+      const url=await uploadToImgBB(file);
+      photos.push(url);
+      uploaded++;
+      renderPhotoGrid();
+      status.innerHTML='<span class="spin">⏳</span> Uploaded '+uploaded+'/'+toUpload.length+'...';
+    } catch(err){
+      failed++;
+    }
+  }
+  if(failed>0){
+    status.className='upload-status error';
+    status.innerHTML='⚠️ '+uploaded+' uploaded, '+failed+' failed. Check ImgBB key.';
+  } else {
+    status.className='upload-status success';
+    status.innerHTML='✅ '+uploaded+' photo'+(uploaded>1?'s':'')+' uploaded!';
+    setTimeout(()=>{status.style.display='none';},2500);
+  }
+}
+
+async function uploadToImgBB(file){
+  const key=window._imgbbKey||localStorage.getItem('imgbb_key')||'';
+  if(!key) throw new Error('No ImgBB key');
+  const b64=await fileToB64(file);
+  const fd=new FormData();
+  fd.append('key',key);
+  fd.append('image',b64);
+  fd.append('name','DV_'+(document.getElementById('s-id').value||Date.now()));
+  const res=await fetch('https://api.imgbb.com/1/upload',{method:'POST',body:fd});
+  const data=await res.json();
+  if(!data.success) throw new Error('Upload failed');
+  return data.data.url;
+}
+
+function fileToB64(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=e=>res(e.target.result.split(',')[1]);
+    r.onerror=rej;
+    r.readAsDataURL(file);
+  });
+}
+
+// ── VIDEO ──
+let videoUrl='';
+
+async function pasteVideo(){
+  try{
+    const text=await navigator.clipboard.readText();
+    if(text && (text.includes('youtube.com')||text.includes('youtu.be'))){
+      setVideo(text.trim());
+      showToast('✅ YouTube link pasted!');
+    } else if(text){
+      setVideo(text.trim());
+      showToast('Link pasted — make sure it\'s a YouTube URL');
+    } else {
+      showToast('Nothing in clipboard. Copy the YouTube link first.');
+    }
+  } catch(e){
+    showToast('Tap the URL field below and paste manually');
+    document.getElementById('s-video').focus();
+  }
+}
+
+function setVideo(url){
+  videoUrl=url;
+  document.getElementById('s-video').value=url;
+  document.getElementById('video-url-text').textContent=url;
+  document.getElementById('video-preview').classList.add('show');
+}
+
+function removeVideo(){
+  videoUrl='';
+  document.getElementById('s-video').value='';
+  document.getElementById('video-preview').classList.remove('show');
+}
+
+function handleVideoInput(val){
+  if(val.includes('youtube.com')||val.includes('youtu.be')){
+    setVideo(val.trim());
+  } else {
+    videoUrl=val.trim();
+  }
+}
+
+// ── REVIEW ──
+function populateReview(){
+  const id=document.getElementById('s-id').value.trim();
+  const name=document.getElementById('s-name').value.trim();
+  const retail=parseFloat(document.getElementById('s-retail').value)||0;
+  const cat=document.getElementById('s-cat').value;
+  const batch=document.getElementById('s-batch').value.trim()||'Batch 1';
+
+  document.getElementById('rv-name').textContent=name||'—';
+  document.getElementById('rv-id').textContent=id||'—';
+  document.getElementById('rv-cat').textContent=cat;
+  document.getElementById('rv-batch').textContent=batch;
+  document.getElementById('rv-price').textContent='$'+retail.toFixed(2);
+
+  // Main image
+  const imgWrap=document.getElementById('review-img-wrap');
+  imgWrap.innerHTML=photos.length>0
+    ?`<img class="review-img" src="${photos[0]}" onerror="this.outerHTML='<div class=review-img-ph>👗</div>'">`
+    :`<div class="review-img-ph">👗</div>`;
+
+  // Photo strip
+  const strip=document.getElementById('rv-photos');
+  strip.innerHTML=photos.slice(1).map(u=>`<img class="review-photo-thumb" src="${u}" onerror="this.style.display='none'">`).join('');
+
+  // Video badge
+  document.getElementById('rv-video-badge').style.display=videoUrl?'block':'none';
+}
+
+// ── SAVE ──
+function saveItem(){
+  const id=document.getElementById('s-id').value.trim();
+  const name=document.getElementById('s-name').value.trim();
+  const batch=document.getElementById('s-batch').value.trim()||'Batch 1';
+  const cat=document.getElementById('s-cat').value;
+  const cost=parseFloat(document.getElementById('s-cost').value)||0;
+  const retail=parseFloat(document.getElementById('s-retail').value)||0;
+  const qty=parseInt(document.getElementById('s-qty').value)||1;
+  const notes=document.getElementById('s-notes').value.trim();
+  const video=videoUrl||(document.getElementById('s-video').value.trim())||'';
+
+  const product={
+    id,name,batch,cat,cost,retail,qty,
+    img:photos[0]||'',
+    photos:[...photos],
+    video,notes,
+    status:'Active',
+    added:new Date().toISOString()
+  };
+
+  // Save to localStorage
+  const existing=JSON.parse(localStorage.getItem('clothing_products')||'[]');
+  existing.push(product);
+  localStorage.setItem('clothing_products',JSON.stringify(existing));
+
+  // Save to Google Sheet
+  if(API_URL){
+    const p={...product};
+    p.photos=p.photos.filter(u=>u&&!u.startsWith('data:'));
+    if(p.img&&p.img.startsWith('data:')) p.img='';
+    fetch(API_URL,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({action:'write',product:p}),
+      redirect:'follow'
+    }).catch(()=>{});
+  }
+
+  // Show success
+  document.getElementById('app').style.display='none';
+  document.getElementById('success').style.display='flex';
+  document.getElementById('success-msg').textContent=
+    '"'+name+'" is now live on desivibes.org';
+}
+
+// ── ADD ANOTHER ──
+function addAnother(){
+  // Reset all fields
+  ['s-id','s-name','s-cost','s-retail','s-notes','s-video'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.value='';
+  });
+  document.getElementById('s-qty').value='1';
+  photos=[];
+  videoUrl='';
+  document.getElementById('video-preview').classList.remove('show');
+  document.getElementById('upload-status').style.display='none';
+  renderPhotoGrid();
+
+  // Back to step 1
+  currentStep=1;
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active','exit-left'));
+  document.getElementById('step-1').classList.add('active');
+  updateUI();
+
+  document.getElementById('success').style.display='none';
+  document.getElementById('app').style.display='flex';
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+</script>
+</body>
+</html>
