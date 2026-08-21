@@ -769,19 +769,27 @@ async function loadFromSheetAPI(){
     const data = await res.json();
     if(data.success && data.data.length > 0){
       // Map sheet columns to product objects
-      const loaded = data.data.map(row => ({
-        id:     String(row['Item_ID']   || row['id']     || ''),
-        name:   String(row['Item_Name'] || row['name']   || ''),
-        cat:    String(row['Category']  || row['cat']    || 'Other'),
-        cost:   parseFloat(row['Cost']  || row['cost']   || 0),
-        retail: parseFloat(row['Retail']|| row['retail'] || 0),
-        img:    String(row['Image_URL'] || row['img']    || ''),
-        qty:    parseInt(row['Qty']     || row['qty']    || 1),
-        status: String(row['Status']    || row['status'] || 'Active'),
-        notes:  String(row['Notes']     || row['notes']  || ''),
-        added:  String(row['added']     || new Date().toISOString())
-      })).filter(p => p.id && p.name);
-      products = loaded;
+      const loaded = data.data.map(row => {
+        const photosRaw=String(row['Photos']||row['photos']||'');
+        const photosArr=photosRaw?photosRaw.split('|').filter(u=>u&&u.startsWith('http')):[];
+        const imgUrl=String(row['Image_URL']||row['img']||'');
+        const allPhotos=imgUrl?[imgUrl,...photosArr.filter(u=>u!==imgUrl)]:photosArr;
+        return {
+          id:     String(row['Item_ID']   || row['id']     || ''),
+          name:   String(row['Item_Name'] || row['name']   || ''),
+          batch:  String(row['Batch']     || row['batch']  || ''),
+          cat:    String(row['Category']  || row['cat']    || 'Other'),
+          cost:   parseFloat(row['Cost']  || row['cost']   || 0),
+          retail: parseFloat(row['Retail']|| row['retail'] || 0),
+          img:    imgUrl,
+          photos: allPhotos,
+          video:  String(row['Video']     || row['video']  || ''),
+          qty:    parseInt(row['Qty']     || row['qty']    || 1),
+          status: String(row['Status']    || row['status'] || 'Active'),
+          notes:  String(row['Notes']     || row['notes']  || ''),
+          added:  String(row['added']     || new Date().toISOString())
+        };
+      }).filter(p => p.id && p.name);      products = loaded;
       save();
       renderAll();
       alert('✅ Loaded ' + loaded.length + ' products from Google Sheet!');
