@@ -229,8 +229,97 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 <div class="topbar">
   <a class="topbar-back" href="admin_panel.html">← Admin</a>
   <div class="topbar-title">Add Item</div>
-  <img class="topbar-logo" src="Desi_Vibe_Logo.png" alt="DV" onerror="this.style.display='none'">
+  <button onclick="toggleHelp()" style="background:rgba(201,151,58,.15);border:1px solid rgba(201,151,58,.3);color:var(--gold);border-radius:20px;padding:.35rem .75rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif">? Help</button>
 </div>
+<!-- HELP PANEL -->
+<div id="help-panel" style="display:none;background:#0f0900;border-bottom:2px solid rgba(201,151,58,.3);padding:1rem 1.1rem;overflow-y:auto;max-height:75vh;-webkit-overflow-scrolling:touch">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.85rem">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:700;color:var(--gold)">📋 How to Add an Item</div>
+    <button onclick="toggleHelp()" style="background:none;border:1px solid rgba(201,151,58,.25);color:var(--gold);border-radius:50%;width:26px;height:26px;font-size:.8rem;cursor:pointer">✕</button>
+  </div>
+
+  <!-- Steps -->
+  <div style="display:flex;flex-direction:column;gap:.5rem">
+
+    <div style="background:#1a0f00;border:1px solid rgba(201,151,58,.15);border-radius:10px;padding:.7rem .85rem">
+      <div style="font-weight:700;font-size:.82rem;color:var(--gold);margin-bottom:.3rem">Step 1 — Item Details</div>
+      <div style="font-size:.76rem;color:#999;line-height:1.6">
+        • <strong style="color:#ccc">Batch #</strong> — e.g. Batch 1, Aug 2026<br>
+        • <strong style="color:#ccc">Item Number</strong> — use next number e.g. IC001, IC002<br>
+        • <strong style="color:#ccc">Item Name</strong> — describe the item clearly<br>
+        • <strong style="color:#ccc">Category</strong> — pick from the list
+      </div>
+    </div>
+
+    <div style="background:#1a0f00;border:1px solid rgba(201,151,58,.15);border-radius:10px;padding:.7rem .85rem">
+      <div style="font-weight:700;font-size:.82rem;color:var(--gold);margin-bottom:.3rem">Step 2 — Pricing</div>
+      <div style="font-size:.76rem;color:#999;line-height:1.6">
+        • <strong style="color:#ccc">Your Cost</strong> — what you paid for it<br>
+        • <strong style="color:#ccc">Retail Price</strong> — what customer pays<br>
+        • Margin calculator shows profit automatically
+      </div>
+    </div>
+
+    <div style="background:#1a0f00;border:1px solid rgba(201,151,58,.15);border-radius:10px;padding:.7rem .85rem">
+      <div style="font-weight:700;font-size:.82rem;color:var(--gold);margin-bottom:.3rem">Step 3 — Photos 📸</div>
+      <div style="font-size:.76rem;color:#999;line-height:1.6">
+        • Tap the big <strong style="color:#ccc">📷 Tap to Add Photos</strong> box<br>
+        • Pick 1 to 5 photos from your gallery or camera<br>
+        • Wait for <strong style="color:#66bb6a">✅ Photo uploaded!</strong> before continuing<br>
+        • First photo = main photo shown on website<br>
+        • Good lighting = better photos = more sales
+      </div>
+    </div>
+
+    <div style="background:#1a0f00;border:1px solid rgba(201,151,58,.15);border-radius:10px;padding:.7rem .85rem">
+      <div style="font-weight:700;font-size:.82rem;color:var(--gold);margin-bottom:.3rem">Step 4 — Video ▶ (Optional)</div>
+      <div style="font-size:.76rem;color:#999;line-height:1.6">
+        • Open YouTube → find video → tap <strong style="color:#ccc">Share → Copy Link</strong><br>
+        • Come back → tap <strong style="color:#ccc">📋 Paste YouTube Link</strong><br>
+        • Skip this step if no video
+      </div>
+    </div>
+
+    <div style="background:#1a0f00;border:1px solid rgba(201,151,58,.15);border-radius:10px;padding:.7rem .85rem">
+      <div style="font-weight:700;font-size:.82rem;color:var(--gold);margin-bottom:.3rem">Step 5 — Description & Save</div>
+      <div style="font-size:.76rem;color:#999;line-height:1.6">
+        • Type fabric, size, color details<br>
+        • Review the item preview card<br>
+        • Tap <strong style="color:#66bb6a">✅ Save Item</strong><br>
+        • Item goes live on desivibes.org within 60 seconds
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Item numbering -->
+  <div style="margin-top:.75rem;background:#1a0f00;border:1px solid rgba(201,151,58,.15);border-radius:10px;padding:.7rem .85rem">
+    <div style="font-weight:700;font-size:.82rem;color:var(--gold);margin-bottom:.35rem">📌 Item Number Guide</div>
+    <div style="font-size:.75rem;color:#999;line-height:1.9">
+      Sarees → <strong style="color:var(--gold)">IC001, IC002…</strong><br>
+      Salwar Suits → <strong style="color:var(--gold)">IC011, IC012…</strong><br>
+      Lehenghas → <strong style="color:var(--gold)">IC021, IC022…</strong><br>
+      Kurtis → <strong style="color:var(--gold)">IC031, IC032…</strong><br>
+      Other → <strong style="color:var(--gold)">IC051, IC052…</strong>
+    </div>
+    <div style="font-size:.72rem;color:#555;margin-top:.4rem">⚠️ Never repeat an item number</div>
+  </div>
+
+  <!-- Common errors -->
+  <div style="margin-top:.75rem;background:rgba(229,57,53,.05);border:1px solid rgba(229,57,53,.2);border-radius:10px;padding:.7rem .85rem">
+    <div style="font-weight:700;font-size:.82rem;color:#ef5350;margin-bottom:.35rem">⚠️ Common Issues</div>
+    <div style="font-size:.75rem;color:#999;line-height:1.8">
+      <strong style="color:#ccc">Photo won't upload</strong> → check internet connection<br>
+      <strong style="color:#ccc">Item already exists</strong> → use next item number<br>
+      <strong style="color:#ccc">Forgot a photo</strong> → go to Admin Panel → Inventory → ✏️ Edit
+    </div>
+  </div>
+
+  <button onclick="toggleHelp()" style="width:100%;margin-top:.85rem;padding:.78rem;border-radius:10px;border:none;background:var(--gold);color:#000;font-size:.88rem;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer">Got it — Close Help</button>
+
+</div>
+
 
 <!-- LOGIN -->
 <div id="login">
@@ -459,6 +548,12 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 // ── STATE ──
 let photos = [];
 let videoUrl = '';
+
+function toggleHelp(){
+  const p=document.getElementById('help-panel');
+  p.style.display=p.style.display==='none'?'block':'none';
+  if(p.style.display==='block') p.scrollTop=0;
+}
 
 // ── CONSTANTS ──
 const _k    = atob(atob('UjNOd05EQTBOalk0T1RBNU1TUT0='));
