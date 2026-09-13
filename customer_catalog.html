@@ -25,15 +25,15 @@ body{background:var(--black);font-family:'Inter',sans-serif;color:var(--offwhite
 .hdr{background:rgba(8,8,8,.97);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
 .hdr-inner{padding:.55rem .9rem;display:flex;align-items:center;justify-content:space-between;gap:.5rem;max-width:1200px;margin:0 auto}
 .hdr-left{display:flex;align-items:center;gap:.5rem;min-width:0;flex:1}
-.hdr-logo{height:26px;width:auto;max-width:55px;object-fit:contain;flex-shrink:0}
-.hdr-wm{height:18px;width:auto;max-width:90px;object-fit:contain}
+.hdr-logo{height:38px;width:auto;max-width:75px;object-fit:contain;flex-shrink:0}
+.hdr-wm{height:22px;width:auto;max-width:110px;object-fit:contain}
 .hdr-btns{display:flex;align-items:center;gap:.4rem;flex-shrink:0}
 .btn-wa{display:flex;align-items:center;gap:.3rem;background:#25d366;color:#fff;border:none;border-radius:3px;padding:.42rem .65rem;font-size:.72rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
 .btn-cart{display:flex;align-items:center;gap:.3rem;background:var(--gold);color:#000;border:none;border-radius:3px;padding:.42rem .65rem;font-size:.72rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;position:relative}
 .cart-badge{background:var(--magenta);color:#fff;border-radius:50%;width:15px;height:15px;font-size:.58rem;font-weight:700;display:flex;align-items:center;justify-content:center;position:absolute;top:-5px;right:-5px}
 
 /* ── HERO ── */
-.hero{background:linear-gradient(180deg,#100800,#000);padding:1.1rem .9rem .9rem;text-align:center;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+.hero{background:linear-gradient(180deg,#120900,#000);padding:1.5rem .9rem 1.1rem;text-align:center;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
 .hero::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
 .hero-logo-wrap{position:relative;width:min(140px,38vw);height:auto;margin:0 auto .5rem;display:block}
 .hero-logo{width:100%;height:auto;object-fit:contain;display:block;animation:glow-pulse 3s ease-in-out infinite}
@@ -45,8 +45,24 @@ body{background:var(--black);font-family:'Inter',sans-serif;color:var(--offwhite
 .hr2{position:absolute;inset:-11px;border-radius:35%;border:1px dashed rgba(201,151,58,.3);border-top-color:var(--gold);animation:scc 12s linear infinite}
 @keyframes sc{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 @keyframes scc{from{transform:rotate(0)}to{transform:rotate(-360deg)}}
-.hero-wm{width:min(180px,48vw);height:auto;object-fit:contain;display:block;margin:.25rem auto .4rem}
+.hero-wm{width:min(380px,85vw);height:auto;object-fit:contain;display:block;margin:.5rem auto .6rem}
 .hero-cats{font-size:.62rem;color:var(--gray);letter-spacing:.08em;text-transform:uppercase}
+
+
+/* ── HERO FULL LOGO ── */
+.hero-full-logo{
+  width:min(320px,80vw);
+  height:auto;
+  object-fit:contain;
+  display:block;
+  margin:0 auto .5rem;
+  filter:drop-shadow(0 0 20px rgba(201,151,58,.45)) drop-shadow(0 0 50px rgba(201,151,58,.2));
+  animation:logo-hero-glow 3s ease-in-out infinite;
+}
+@keyframes logo-hero-glow{
+  0%,100%{filter:drop-shadow(0 0 15px rgba(201,151,58,.35)) drop-shadow(0 0 35px rgba(201,151,58,.15))}
+  50%{filter:drop-shadow(0 0 30px rgba(201,151,58,.7)) drop-shadow(0 0 70px rgba(201,151,58,.3))}
+}
 
 /* ── FILTER BAR ── */
 .filter-bar{background:rgba(8,8,8,.95);border-bottom:1px solid var(--border);position:sticky;top:48px;z-index:90;backdrop-filter:blur(6px)}
@@ -365,11 +381,9 @@ const API_URL='https://script.google.com/macros/s/AKfycbzculngSTM7SLtazn_Nekwhor
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-logo-wrap">
-    <div class="hr1"></div><div class="hr2"></div>
-    <img class="hero-logo" src="Desi_Vibe_Logo.png" alt="Desi Vibes" onerror="this.style.display='none'">
-  </div>
-  <img class="hero-wm" src="Desi_vibes_word_only.png" alt="Desi Vibes" onerror="this.style.display='none'">
+  <!-- Full DV logo — big and centered -->
+  <img class="hero-full-logo" src="Desi_Vibe_Logo.png" alt="Desi Vibes" onerror="this.style.display='none'">
+  <!-- Wordmark below -->
   <div class="hero-cats">Sarees · Salwar Suits · Lehenghas · Kurtis & More</div>
 </div>
 
